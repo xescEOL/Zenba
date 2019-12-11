@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "712226601413",
+    "firebase_url": "https://zenba-3a261.firebaseio.com",
+    "project_id": "zenba-3a261",
+    "storage_bucket": "zenba-3a261.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712226601413:android:e1b70cd73cfdc5013cb3ac",
+        "android_client_info": {
+          "package_name": "com.rumba.zenba"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "712226601413-uee6ivs1lj4uk17vklns0ooh73jljlj8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ1T3xRamzli4CKB5yCWPvVngvAVnJ2r8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "712226601413-uee6ivs1lj4uk17vklns0ooh73jljlj8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
