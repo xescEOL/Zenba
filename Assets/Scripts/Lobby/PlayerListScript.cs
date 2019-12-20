@@ -45,6 +45,8 @@ public class PlayerListScript : MonoBehaviour
 
     public float mTimeLeft = 10;
 
+    public bool mStartTime = false;
+
 
     private void Awake()
     {
@@ -93,6 +95,8 @@ public class PlayerListScript : MonoBehaviour
 
         RetrieveGameValue();
         RetrievePlayersList();
+        
+        Time.timeScale = 1;
     }
 
     // Update is called once per frame
@@ -114,14 +118,19 @@ public class PlayerListScript : MonoBehaviour
                 }
                 else
                 {
-                    if (mTimeLeft < 0)
+                    if (mTimeLeft < 1)
                     {
                         //mCurrentQuestion++;
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(mCurrentQuestionNoRefresh + 1);
                         mLobby.StartQuiz();
                     }
                     mInfoTextGame.text = "Pregunta en " + mTimeLeft.ToString("0");
-                    mTimeLeft -= Time.fixedDeltaTime;
+                    //mTimeLeft -= Time.fixedDeltaTime;
+                    if (!mStartTime)
+                    {
+                        StartCoroutine(LoseTime());
+                        mStartTime = true;
+                    }
                     mChangeListPlayers = true;
                 }
             }
@@ -228,7 +237,7 @@ public class PlayerListScript : MonoBehaviour
             foreach (PlayerInfo item in mPlayerList)
             {
                 Debug.Log("item: " + item.mName + " current: " + item.mCurrentQuestion + " mCurrentQuestion: " + mCurrentQuestionNoRefresh + " start:" + mStart);
-                if (item.mCurrentQuestion != mCurrentQuestionNoRefresh)
+                if (item.mCurrentQuestion < mCurrentQuestionNoRefresh)
                     ret = false;
             }
         }
@@ -264,6 +273,16 @@ public class PlayerListScript : MonoBehaviour
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("currentquestion").SetValueAsync(mCurrentQuestionNoRefresh);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("finish").SetValueAsync(false);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("players").SetValueAsync(mPlayerList.Count);
+    }
+
+    //Countdown Thread
+    IEnumerator LoseTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            mTimeLeft--;
+        }
     }
 
 }

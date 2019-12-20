@@ -5,31 +5,39 @@ using Firebase;
 using Firebase.Unity.Editor;
 using Firebase.Database;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+
 
 public class QuizScene : MonoBehaviour
 {
-    [SerializeField] List<GameObject> mListAnswersButtons = new List<GameObject>();
-    [SerializeField] GameObject mButtonAcceptAnswer;
-    [SerializeField] GameObject mButtonBonus50;
-    [SerializeField] GameObject mButtonBonus15;
-    [SerializeField] GameObject mButtonBonusRnd;
-    [SerializeField] GameObject mResult;
+    public List<GameObject> mListAnswersButtons = new List<GameObject>();
+    public GameObject mButtonAcceptAnswer;
+    public GameObject mButtonBonus50;
+    public GameObject mButtonBonus15;
+    public GameObject mButtonBonusRnd;
+    public GameObject mResult;
+    public Text mAnserTxt;
+    public Image mAnswerBG;
     private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
     public double mFirstElement;
     public double mAnswerUser;
     public bool mExit = false;
-    public float mTimeLeft = 10;
+    public float mTimeLeft = 5;
+    public bool mStartTime = false;
+    Animator mAnswerAnim;
 
     private void Awake()
     {
         mFirstElement = GenerateOptions(LobbyScript.mCorrectAnswer);
+        Time.timeScale = 1;
     }
 
     // Start is called before the first frame update
     void Start()
     {
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
+        mAnswerAnim = mAnswerBG.GetComponent<Animator>();
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         mResult.SetActive(false);
@@ -45,15 +53,19 @@ public class QuizScene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (mAnswerUser != -12345678)
+        if (mAnswerUser != -12345678 && !mExit)
         {
             mButtonAcceptAnswer.SetActive(true);
         }
         if (mExit)
         {
             Debug.Log("EXIT " + mTimeLeft);
-            mTimeLeft = mTimeLeft - Time.fixedDeltaTime;
-            if (mTimeLeft < 0)
+            if (!mStartTime)
+            {
+                StartCoroutine(LoseTime());
+                mStartTime = true;
+            }
+            if (mTimeLeft < 1)
             {
                 Debug.Log("lOBBY");
                 //reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(GetCurrentQuestion() + 1);
@@ -84,10 +96,13 @@ public class QuizScene : MonoBehaviour
     public void SetAnswerUser(double pAnswerUser)
     {
         mAnswerUser = pAnswerUser;
+        mAnserTxt.text = pAnswerUser.ToString();
     }
 
     public void ConfirmAnswer()
     {
+        mButtonAcceptAnswer.SetActive(false);
+        //mButtonAcceptAnswer.GetComponent<UnityEngine.UI.Button>().interactable = true;
         mResult.SetActive(true);
         if (mAnswerUser == LobbyScript.mCorrectAnswer)
         {
@@ -100,6 +115,7 @@ public class QuizScene : MonoBehaviour
                 reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(true);
                 reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
             }
+            mAnswerAnim.SetBool("PlayAnim", true);
         }
         else
         {
@@ -221,4 +237,15 @@ public class QuizScene : MonoBehaviour
             }
         }
     }
+
+    //Countdown Thread
+    IEnumerator LoseTime()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            mTimeLeft--;
+        }
+    }
+
 }

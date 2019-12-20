@@ -23,7 +23,7 @@ public class TouchBar : MonoBehaviour
     {
         audioData = GetComponent<AudioSource>();
         myImageComponent = GetComponent<Image>();
-        Time.timeScale = 0;
+        //Time.timeScale = 0;
         transform.GetChild(0).GetComponent<UnityEngine.UI.Text>().text = (mQuizScene.mFirstElement + (LobbyScript.mVariant * mBarNum)).ToString();
         mAnim = GetComponent<Animator>();
         mAnim.updateMode = AnimatorUpdateMode.UnscaledTime;

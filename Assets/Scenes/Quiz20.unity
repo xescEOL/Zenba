@@ -288,6 +288,99 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mQuizScene: {fileID: 392359627}
+--- !u!1 &69072813
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 69072814}
+  - component: {fileID: 69072817}
+  - component: {fileID: 69072816}
+  - component: {fileID: 69072815}
+  m_Layer: 5
+  m_Name: AnswerBackground
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &69072814
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69072813}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 392359626}
+  m_RootOrder: 27
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 846.83}
+  m_SizeDelta: {x: 960, y: -0.3335}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!95 &69072815
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69072813}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a5f0d422fd0f8c643a1ec503564b4126, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &69072816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69072813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.2096728, g: 0.8490566, b: 0.14017442, a: 0.72156864}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 0}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &69072817
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 69072813}
+  m_CullTransparentMesh: 0
 --- !u!1 &122746683
 GameObject:
   m_ObjectHideFlags: 0
@@ -970,6 +1063,7 @@ RectTransform:
   - {fileID: 1383064301}
   - {fileID: 812589028}
   - {fileID: 1755206684}
+  - {fileID: 69072814}
   - {fileID: 417949142}
   m_Father: {fileID: 589498858}
   m_RootOrder: 0
@@ -1017,10 +1111,13 @@ MonoBehaviour:
   mButtonBonus15: {fileID: 867104311}
   mButtonBonusRnd: {fileID: 1383064300}
   mResult: {fileID: 812589027}
+  mAnserTxt: {fileID: 417949143}
+  mAnswerBG: {fileID: 69072816}
   mFirstElement: 0
   mAnswerUser: 0
   mExit: 0
   mTimeLeft: 6
+  mStartTime: 0
 --- !u!1 &410471304
 GameObject:
   m_ObjectHideFlags: 0
@@ -1128,7 +1225,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 392359626}
-  m_RootOrder: 27
+  m_RootOrder: 28
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1155,10 +1252,10 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 12800000, guid: 323bc44b49363424694a1d6710ebe780, type: 3}
-    m_FontSize: 300
-    m_FontStyle: 0
+    m_FontSize: 200
+    m_FontStyle: 1
     m_BestFit: 0
-    m_MinSize: 3
+    m_MinSize: 1
     m_MaxSize: 300
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -1166,7 +1263,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 
+  m_Text: '
+
+'
 --- !u!222 &417949144
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2424,26 +2523,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!1 &800225373 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3036210885579867120, guid: 6bb33cc843e7249448b0208dfe42e6d1,
-    type: 3}
-  m_PrefabInstance: {fileID: 1871623174}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &800225377
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800225373}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b18a4d6aeccc9b64d807f03a39bd5cf5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mQuizScene: {fileID: 392359627}
-  mButtonFather: {fileID: 1755206683}
 --- !u!1 &812589027
 GameObject:
   m_ObjectHideFlags: 0

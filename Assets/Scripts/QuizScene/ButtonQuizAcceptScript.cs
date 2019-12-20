@@ -14,6 +14,6 @@ public class ButtonQuizAcceptScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-            GetComponent<UnityEngine.UI.Text>().text = "Confirmar " + mQuizScene.mAnswerUser;
+            
     }
 }
