@@ -21,6 +21,7 @@ public class LobbyScript : MonoBehaviour
     public static double mMinOption = -999999;
     public bool mRetrieveDB = false;
     public long mCountQuizs = 0;
+    public int mTipoQuiz = 0;
     // Start is called before the first frame update
 
     private void Awake()
@@ -31,7 +32,7 @@ public class LobbyScript : MonoBehaviour
     {
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
-        RetrieveData("quests20ESP");
+        RetrieveData("questsESP");
     }
 
     // Update is called once per frame
@@ -47,7 +48,12 @@ public class LobbyScript : MonoBehaviour
     public void StartQuiz()
     {
         if (mRetrieveDB & CorrectQuestion())
-            SceneManager.LoadScene("Quiz20");
+        {
+            if (mTipoQuiz == 0)
+                SceneManager.LoadScene("Quiz20");
+            else
+                SceneManager.LoadScene("QuizPatata");
+        }
         else if (mRetrieveDB & !CorrectQuestion())
             Debug.Log("Question NOT correct");
     }
@@ -58,17 +64,21 @@ public class LobbyScript : MonoBehaviour
         FirebaseDatabase.DefaultInstance.GetReference(pReference).GetValueAsync().ContinueWith(task =>
         {
             DataSnapshot snapshot = task.Result;
-            mQuizTxt = snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("question").Value.ToString();
-            mCorrectAnswer = double.Parse(snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("correct").Value.ToString(), CultureInfo.InvariantCulture);
-            mVariant = double.Parse(snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("variant").Value.ToString(), CultureInfo.InvariantCulture);
-            if (snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("maxValue").Value.ToString() == "")
+            string quizNumber = GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].Split('_')[0];
+            mTipoQuiz = int.Parse(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].Split('_')[1]);
+            mQuizTxt = snapshot.Child(quizNumber).Child("question").Value.ToString();
+            mCorrectAnswer = double.Parse(snapshot.Child(quizNumber).Child("correct").Value.ToString(), CultureInfo.InvariantCulture);
+            mVariant = double.Parse(snapshot.Child(quizNumber).Child("variant").Value.ToString(), CultureInfo.InvariantCulture);
+            if (snapshot.Child(quizNumber).Child("maxValue").Value.ToString() == "")
                 mMaxOption = 99999999;
             else
-                mMaxOption = double.Parse(snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("maxValue").Value.ToString(), CultureInfo.InvariantCulture);
-            if (snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("minValue").Value.ToString() == "")
+                mMaxOption = double.Parse(snapshot.Child(quizNumber).Child("maxValue").Value.ToString(), CultureInfo.InvariantCulture);
+            if (snapshot.Child(quizNumber).Child("minValue").Value.ToString() == "")
                 mMinOption = -99999999;
             else
-                mMinOption = double.Parse(snapshot.Child(GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs].ToString()).Child("minValue").Value.ToString(), CultureInfo.InvariantCulture);
+                mMinOption = double.Parse(snapshot.Child(quizNumber).Child("minValue").Value.ToString(), CultureInfo.InvariantCulture);
+            if (!snapshot.Child(quizNumber).Child("patata").Value.ToString().Equals("True"))
+                mTipoQuiz = 0;
             Debug.Log("Retrive Info: " + mQuizTxt + ", " + mCorrectAnswer + ", " + mVariant + ", " + mMaxOption + ", " + mMinOption + ".");
         });
     }

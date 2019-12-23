@@ -74,6 +74,12 @@ public class CreateScript : MonoBehaviour
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(mNameGame.text);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("bonus").SetValueAsync(0);
+        GlobalVariables.mGameAdminUId = auth.CurrentUser.UserId;
+        GlobalVariables.mGameMode = mRealTime ? 0 : 1;
+        GlobalVariables.mGameName = mNameGame.text;
+        GlobalVariables.mGameWinMode = mQuestionsWin ? 0 : 1;
+        GlobalVariables.mGameWinValue = int.Parse(mDropDown.options[mDropDown.value].text);
+        GlobalVariables.mCurrentPoints = 0;
 
         CreateListQuizs();
         SceneManager.LoadScene("WaitingPlayers");
@@ -95,10 +101,11 @@ public class CreateScript : MonoBehaviour
         while (numlist <= int.Parse(mDropDown.options[mDropDown.value].text))
         {
             int rnd = new System.Random().Next(1, GlobalVariables.mNumQuizs20);
-            if (!GlobalVariables.mListQuizs.Contains(rnd))
+            if (!GlobalVariables.mListQuizs.Contains(rnd + "_0") && !GlobalVariables.mListQuizs.Contains(rnd + "_1"))
             {
-                reference.Child("games").Child(GlobalVariables.mPinGame).Child("list").Child(numlist.ToString()).SetValueAsync(rnd).ToString();
-                GlobalVariables.mListQuizs.Add(rnd);
+                int rnd2 = new System.Random().Next(0, 2);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("list").Child(numlist.ToString()).SetValueAsync(rnd + "_" + rnd2).ToString();
+                GlobalVariables.mListQuizs.Add(rnd + "_" + rnd2);
                 numlist++;
             }
         }

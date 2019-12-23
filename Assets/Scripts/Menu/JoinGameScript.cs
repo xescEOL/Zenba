@@ -49,10 +49,16 @@ public class JoinGameScript : MonoBehaviour
             Debug.Log(task.Result.Child("start"));
             DataSnapshot snapshot = task.Result;
             if (snapshot.Child("start").Value.ToString().Equals("False")){
+                GlobalVariables.mGameMode = int.Parse(snapshot.Child("playmode").Value.ToString());
+                GlobalVariables.mGameWinMode = int.Parse(snapshot.Child("winmode").Value.ToString());
+                GlobalVariables.mGameWinValue = int.Parse(snapshot.Child("winvalue").Value.ToString());
+                GlobalVariables.mGameAdminUId = snapshot.Child("admin").Value.ToString();
+                GlobalVariables.mGameName = snapshot.Child("name").Value.ToString();
+                GlobalVariables.mCurrentPoints = 0;
                 mPinCorrect = 1;
                 for(int i = 1; i<= GlobalVariables.mNumQuizs20; i++)
                 {
-                    GlobalVariables.mListQuizs.Add(int.Parse(snapshot.Child("list").Child(i.ToString()).Value.ToString()));
+                    GlobalVariables.mListQuizs.Add(snapshot.Child("list").Child(i.ToString()).Value.ToString());
                 }
             }
             else

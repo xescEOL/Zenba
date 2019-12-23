@@ -13,7 +13,8 @@ public class PlayerListScript : MonoBehaviour
 {
     private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
-    public Text mInfoTextGame;
+    public GameObject mSecondsTextGame;
+    public GameObject mInfoTextGame;
     public LobbyScript mLobby;
     public GameObject mPlayer1;
     public GameObject mPlayer2;
@@ -31,19 +32,20 @@ public class PlayerListScript : MonoBehaviour
     public GameObject mPlayer14;
     public GameObject mPlayer15;
     public GameObject mListPlayers;
+    public GameObject mNumQuizTxt;
     public bool mChangeListPlayers = false;
     public static List<PlayerInfo> mPlayerList = new List<PlayerInfo>();
     public bool mCurrentUserAdmin = false;
 
     public bool mStart = false;
     public static int mCurrentQuestionNoRefresh = -1;
-    public int mGameMode = 0;
+    /*public int mGameMode = 0;
     public int mWinMode = 0;
     public int mWinValue = 99999;
     public string mAdminUId;
-    public string mNameGame;
-
-    public float mTimeLeft = 10;
+    public string mNameGame;*/
+    private bool mprova = false;
+    public float mTimeLeft = 9;
 
     public bool mStartTime = false;
 
@@ -55,10 +57,9 @@ public class PlayerListScript : MonoBehaviour
         mCurrentUserAdmin = false;
         mStart = false;
         mCurrentQuestionNoRefresh = -1;
-        mGameMode = 0;
-        mWinMode = 0;
-        mWinValue = 99999;
-        mTimeLeft = 10;
+        mTimeLeft = 9;
+        mInfoTextGame.SetActive(true);
+        
 
         /*if (!CreateScript.mPin.Equals(""))
         {
@@ -93,17 +94,20 @@ public class PlayerListScript : MonoBehaviour
         mPlayer14.SetActive(false);
         mPlayer15.SetActive(false);
 
-        RetrieveGameValue();
+        //RetrieveGameValue();
         RetrievePlayersList();
         
         Time.timeScale = 1;
+        mprova = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (mCurrentQuestionNoRefresh == -1 && GlobalVariables.mCurrentQuizs != -1)
+        if (mCurrentQuestionNoRefresh == -1 && GlobalVariables.mCurrentQuizs != -1) {
             mCurrentQuestionNoRefresh = GlobalVariables.mCurrentQuizs;
+            mNumQuizTxt.GetComponent<UnityEngine.UI.Text>().text = mCurrentQuestionNoRefresh + "/" + GlobalVariables.mGameWinValue;
+        }
         if (mChangeListPlayers)
         {
             Debug.Log("mChangeListPlayers");
@@ -113,7 +117,7 @@ public class PlayerListScript : MonoBehaviour
             {
                 if (!Winner().Equals(""))
                 {
-                    mInfoTextGame.text = Winner() + " ES EL GANADOR!";
+                    mInfoTextGame.GetComponent<UnityEngine.UI.Text>().text = Winner() + " ES EL GANADOR!";
                     reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("finish").SetValueAsync(true);
                 }
                 else
@@ -122,9 +126,12 @@ public class PlayerListScript : MonoBehaviour
                     {
                         //mCurrentQuestion++;
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(mCurrentQuestionNoRefresh + 1);
+                        //StopAllCoroutines();
+                        mprova = false;
                         mLobby.StartQuiz();
                     }
-                    mInfoTextGame.text = "Pregunta en " + mTimeLeft.ToString("0");
+                    mSecondsTextGame.SetActive(true);
+                    mSecondsTextGame.GetComponent<UnityEngine.UI.Text>().text = mTimeLeft.ToString("0");
                     //mTimeLeft -= Time.fixedDeltaTime;
                     if (!mStartTime)
                     {
@@ -147,7 +154,8 @@ public class PlayerListScript : MonoBehaviour
                 transform.GetChild(cont).gameObject.SetActive(true);
                 transform.GetChild(cont).transform.GetChild(0).GetComponent<UnityEngine.UI.Text>().text = item.mName;
                 transform.GetChild(cont).transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text = item.mPoints.ToString();
-                cont++;
+                transform.GetChild(cont).transform.GetChild(3).GetComponent<UnityEngine.UI.Text>().text = item.mName.Substring(0, 1);
+            cont++;
             }
             mChangeListPlayers = false;
     }
@@ -168,22 +176,29 @@ public class PlayerListScript : MonoBehaviour
         }
         // Do something with the data in args.Snapshot
         mPlayerList.Clear();
-        foreach (DataSnapshot user in args.Snapshot.Children)
+        if (mprova)
         {
-            Debug.Log("PlayerData: " + user.Key + ":" + user.Child("points").Value);
-            PlayerInfo player = new PlayerInfo();
-            player.mUid = user.Key;
-            player.mPoints = int.Parse(user.Child("points").Value.ToString());
-            player.mName = user.Child("name").Value.ToString();
-            player.mCurrentQuestion = int.Parse(user.Child("currentquestion").Value.ToString());
-            player.mRacha = int.Parse(user.Child("racha").Value.ToString());
-            player.mBonus = user.Child("bonus").Value.ToString().Equals("True");
-            mPlayerList.Add(player);
-            mChangeListPlayers = true;
+            foreach (DataSnapshot user in args.Snapshot.Children)
+            {
+                
+                Debug.Log("PlayerData: " + user.Key + ":" + user.Child("points").Value);
+                PlayerInfo player = new PlayerInfo();
+                player.mUid = user.Key;
+                if (user.Child("points").Value != null)
+                    player.mPoints = int.Parse(user.Child("points").Value.ToString());
+                player.mName = user.Child("name").Value.ToString();
+                player.mCurrentQuestion = int.Parse(user.Child("currentquestion").Value.ToString());
+                if (user.Child("bonus").Value != null)
+                    player.mBonus = user.Child("bonus").Value.ToString().Equals("True");
+                if (user.Child("racha").Value != null)
+                    player.mRacha = int.Parse(user.Child("racha").Value.ToString());
+                mPlayerList.Add(player);
+                mChangeListPlayers = true;
+            }
         }
     }
 
-    public void RetrieveGameValue() //from the database (server)...
+    /*public void RetrieveGameValue() //from the database (server)...
     {
         FirebaseDatabase.DefaultInstance
         .GetReference("games").Child(GlobalVariables.mPinGame)
@@ -208,7 +223,7 @@ public class PlayerListScript : MonoBehaviour
         mNameGame = game.Child("name").Value.ToString();
         if (mAdminUId.Equals(auth.CurrentUser.UserId))
             mCurrentUserAdmin = true;
-    }
+    }*/
 
     public void ResetListPlayers()
     {
@@ -254,11 +269,11 @@ public class PlayerListScript : MonoBehaviour
         int value = 0;
         foreach (PlayerInfo item in mPlayerList)
         {
-            if (mWinMode == 0 & mCurrentQuestionNoRefresh >= mWinValue & item.mPoints > value)
+            if (GlobalVariables.mGameWinMode == 0 & mCurrentQuestionNoRefresh >= GlobalVariables.mGameWinValue & item.mPoints > value)
             {
                 ret = item.mName;
                 value = item.mPoints;
-            }else if (mWinMode == 1 & item.mPoints >= mWinValue & item.mPoints > value)
+            }else if (GlobalVariables.mGameWinMode == 1 & item.mPoints >= GlobalVariables.mGameWinValue & item.mPoints > value)
             {
                 ret = item.mName;
                 value = item.mPoints;
@@ -269,7 +284,7 @@ public class PlayerListScript : MonoBehaviour
 
     public void SaveCurrentGame()
     {
-        reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(mNameGame);
+        //reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(mNameGame);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("currentquestion").SetValueAsync(mCurrentQuestionNoRefresh);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("finish").SetValueAsync(false);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("players").SetValueAsync(mPlayerList.Count);
@@ -278,7 +293,7 @@ public class PlayerListScript : MonoBehaviour
     //Countdown Thread
     IEnumerator LoseTime()
     {
-        while (true)
+        while (mTimeLeft>0.9)
         {
             yield return new WaitForSeconds(1);
             mTimeLeft--;

@@ -24,6 +24,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Quiz20.unity
     guid: aa3074bea83a52647831c2e90be9e11d
   - enabled: 1
-    path: Assets/Scenes/Quiz20H.unity
-    guid: 60673797e6d291f4d86d31341e85171d
+    path: Assets/Scenes/QuizPatata.unity
+    guid: 794f764a7a3a7754ebefa60cf226c53d
   m_configObjects: {}

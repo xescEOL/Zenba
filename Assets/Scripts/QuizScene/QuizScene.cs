@@ -26,11 +26,13 @@ public class QuizScene : MonoBehaviour
     public float mTimeLeft = 5;
     public bool mStartTime = false;
     Animator mAnswerAnim;
+    private int mCurrentRacha = 0;
 
     private void Awake()
     {
         mFirstElement = GenerateOptions(LobbyScript.mCorrectAnswer);
         Time.timeScale = 1;
+        
     }
 
     // Start is called before the first frame update
@@ -43,7 +45,8 @@ public class QuizScene : MonoBehaviour
         mResult.SetActive(false);
         mAnswerUser = -12345678;
         mButtonAcceptAnswer.SetActive(false);
-        if(GetCurrentRacha() > 1){ //2
+        mCurrentRacha = GetCurrentRacha();
+        if (mCurrentRacha > 1){ //2
             mButtonBonus50.GetComponent<UnityEngine.UI.Button>().interactable = true;
             mButtonBonus15.GetComponent<UnityEngine.UI.Button>().interactable = true;
             mButtonBonusRnd.GetComponent<UnityEngine.UI.Button>().interactable = true;
@@ -65,14 +68,6 @@ public class QuizScene : MonoBehaviour
                 StartCoroutine(LoseTime());
                 mStartTime = true;
             }
-            if (mTimeLeft < 1)
-            {
-                Debug.Log("lOBBY");
-                //reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(GetCurrentQuestion() + 1);
-                //reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("points").SetValueAsync(GetPoints() + GetPointsAnswer());
-                SceneManager.LoadScene("LobbyGame");
-            }
-            
         }
         
     }
@@ -108,12 +103,12 @@ public class QuizScene : MonoBehaviour
         {
             Debug.Log("CORRECT!!!!!");
             mResult.transform.GetChild(1).gameObject.GetComponent<UnityEngine.UI.Text>().text = "HAS ACERTADO!";
-            if (GetCurrentRacha() < 3)
-                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(GetCurrentRacha() + 1);
+            if (mCurrentRacha < 3)
+                mCurrentRacha++;
             else
             {
                 reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(true);
-                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
+                mCurrentRacha = 0;
             }
             mAnswerAnim.SetBool("PlayAnim", true);
         }
@@ -121,18 +116,21 @@ public class QuizScene : MonoBehaviour
         {
             Debug.Log("WRONG ANSWER!!!!!");
             mResult.transform.GetChild(1).gameObject.GetComponent<UnityEngine.UI.Text>().text = "La respuesta correcta es:";
-            reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
+            
         }
         mResult.transform.GetChild(2).gameObject.GetComponent<UnityEngine.UI.Text>().text = LobbyScript.mCorrectAnswer.ToString();
         mResult.transform.GetChild(3).gameObject.GetComponent<UnityEngine.UI.Text>().text = "+" + GetPointsAnswer() + "p";
         Debug.Log("POINTS: " + GetPointsAnswer());
-        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(GetCurrentQuestion() + 1);
         GlobalVariables.mCurrentQuizs++;
-        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("points").SetValueAsync(GetPoints() + GetPointsAnswer());
-        
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(GlobalVariables.mCurrentQuizs);
+        GlobalVariables.mCurrentPoints = GetPointsAnswer() + GlobalVariables.mCurrentPoints;
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("points").SetValueAsync(GlobalVariables.mCurrentPoints);
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(mCurrentRacha);
+
 
         //reference.Child("games").Child(PlayerListScript.mPinGame).Child("currentgame").SetValueAsync(PlayerListScript.mCurrentQuestion + 1);
         mExit = true;
+        
     }
 
     public int GetPointsAnswer()
@@ -236,16 +234,15 @@ public class QuizScene : MonoBehaviour
                 }
             }
         }
+        mCurrentRacha = 0;
     }
 
     //Countdown Thread
     IEnumerator LoseTime()
     {
-        while (true)
-        {
-            yield return new WaitForSeconds(1);
-            mTimeLeft--;
-        }
+        yield return new WaitForSeconds(4);
+        Debug.Log("lOBBY");
+        SceneManager.LoadScene("LobbyGame");
     }
 
 }

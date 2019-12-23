@@ -14,8 +14,14 @@ public class GlobalVariables : MonoBehaviour
     public static string mUserName = "";
     public static string mPinGame = "";
     public static int mNumQuizs20 = 0;
-    public static List<int> mListQuizs = new List<int>();
+    public static List<string> mListQuizs = new List<string>();
     public static int mCurrentQuizs = 0;
+    public static int mCurrentPoints = 0;
+    public static int mGameMode = 0;
+    public static int mGameWinMode = 0;
+    public static int mGameWinValue = 99999;
+    public static string mGameAdminUId = "";
+    public static string mGameName = "";
 
     private void Awake()
     {
@@ -23,7 +29,7 @@ public class GlobalVariables : MonoBehaviour
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
         RetrieveInfo(auth.CurrentUser.UserId);
-        RetrieveNumQuizs("quests20ESP");
+        RetrieveNumQuizs("questsESP");
     }
 
     // Start is called before the first frame update

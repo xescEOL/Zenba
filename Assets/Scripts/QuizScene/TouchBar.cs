@@ -8,7 +8,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AudioSource))]
 public class TouchBar : MonoBehaviour
 {
-    [SerializeField] int mBarNum;
+    public int mBarNum;
     AudioSource audioData;
     Image myImageComponent;
     public Sprite selectedImg;
