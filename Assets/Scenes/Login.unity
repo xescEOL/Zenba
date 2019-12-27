@@ -189,10 +189,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1080, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -239,10 +239,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1595036707}
     m_Modifications:
-    - target: {fileID: 3036210885505674227, guid: 6bb33cc843e7249448b0208dfe42e6d1,
+    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
-      propertyPath: m_Name
-      value: RegistrarButton
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1595036708}
+    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SignUpPush
       objectReference: {fileID: 0}
     - target: {fileID: 3036210885505674226, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
@@ -349,15 +354,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
+    - target: {fileID: 3036210885505674227, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1595036708}
-    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SignUpPush
+      propertyPath: m_Name
+      value: RegistrarButton
       objectReference: {fileID: 0}
     - target: {fileID: 3036210885579867086, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
@@ -379,10 +379,15 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1595036707}
     m_Modifications:
-    - target: {fileID: 3036210885505674227, guid: 6bb33cc843e7249448b0208dfe42e6d1,
+    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
-      propertyPath: m_Name
-      value: LoginButton
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1595036708}
+    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LoginPush
       objectReference: {fileID: 0}
     - target: {fileID: 3036210885505674226, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
@@ -489,15 +494,10 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
+    - target: {fileID: 3036210885505674227, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1595036708}
-    - target: {fileID: 3036210885505674225, guid: 6bb33cc843e7249448b0208dfe42e6d1,
-        type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: LoginPush
+      propertyPath: m_Name
+      value: LoginButton
       objectReference: {fileID: 0}
     - target: {fileID: 3036210885579867086, guid: 6bb33cc843e7249448b0208dfe42e6d1,
         type: 3}
@@ -1075,6 +1075,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1595036707}
     m_Modifications:
+    - target: {fileID: 1602664594117618178, guid: e15f2762961ebfc48a9271c8089942ae,
+        type: 3}
+      propertyPath: m_ContentType
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602664594117618178, guid: e15f2762961ebfc48a9271c8089942ae,
+        type: 3}
+      propertyPath: m_KeyboardType
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1602664594117618178, guid: e15f2762961ebfc48a9271c8089942ae,
+        type: 3}
+      propertyPath: m_CharacterValidation
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1602664594137282688, guid: e15f2762961ebfc48a9271c8089942ae,
         type: 3}
       propertyPath: m_Name
@@ -1118,7 +1133,7 @@ PrefabInstance:
     - target: {fileID: 1602664594137282689, guid: e15f2762961ebfc48a9271c8089942ae,
         type: 3}
       propertyPath: m_RootOrder
-      value: 5
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 1602664594137282689, guid: e15f2762961ebfc48a9271c8089942ae,
         type: 3}
@@ -1185,21 +1200,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 1602664594117618178, guid: e15f2762961ebfc48a9271c8089942ae,
-        type: 3}
-      propertyPath: m_ContentType
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 1602664594117618178, guid: e15f2762961ebfc48a9271c8089942ae,
-        type: 3}
-      propertyPath: m_KeyboardType
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 1602664594117618178, guid: e15f2762961ebfc48a9271c8089942ae,
-        type: 3}
-      propertyPath: m_CharacterValidation
-      value: 5
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e15f2762961ebfc48a9271c8089942ae, type: 3}
 --- !u!1001 &4545460199100992517
@@ -1209,6 +1209,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1595036707}
     m_Modifications:
+    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
+        type: 3}
+      propertyPath: m_ContentType
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
+        type: 3}
+      propertyPath: m_InputType
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
+        type: 3}
+      propertyPath: m_KeyboardType
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
+        type: 3}
+      propertyPath: m_CharacterValidation
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 6587220640423697478, guid: 7eedc2305d0a56942afdf91a8d11ce10,
         type: 3}
       propertyPath: m_Name
@@ -1252,7 +1272,7 @@ PrefabInstance:
     - target: {fileID: 8895181427783681981, guid: 7eedc2305d0a56942afdf91a8d11ce10,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 8895181427783681981, guid: 7eedc2305d0a56942afdf91a8d11ce10,
         type: 3}
@@ -1319,26 +1339,6 @@ PrefabInstance:
       propertyPath: m_Pivot.y
       value: 0.5
       objectReference: {fileID: 0}
-    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
-        type: 3}
-      propertyPath: m_ContentType
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
-        type: 3}
-      propertyPath: m_InputType
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
-        type: 3}
-      propertyPath: m_KeyboardType
-      value: 6
-      objectReference: {fileID: 0}
-    - target: {fileID: 876417786968292520, guid: 7eedc2305d0a56942afdf91a8d11ce10,
-        type: 3}
-      propertyPath: m_CharacterValidation
-      value: 4
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7eedc2305d0a56942afdf91a8d11ce10, type: 3}
 --- !u!1001 &5461372953530021500
@@ -1391,7 +1391,7 @@ PrefabInstance:
     - target: {fileID: 5461372954817051161, guid: f69a4bc3375c1724e84a776c2e4b9637,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5461372954817051161, guid: f69a4bc3375c1724e84a776c2e4b9637,
         type: 3}

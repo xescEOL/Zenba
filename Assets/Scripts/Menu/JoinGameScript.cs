@@ -7,15 +7,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
 public class JoinGameScript : MonoBehaviour
 {
     private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
+    public Button mJoinButton;
     public Text mPinInput;
     public int mPinCorrect;
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1;
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
@@ -42,11 +45,13 @@ public class JoinGameScript : MonoBehaviour
 
     public void ShowWaitingPlayers()
     {
+        //mJoinButton.enabled = false;
+        mJoinButton.interactable = false;
+        StartCoroutine(CourtineCheckDataSave());
         GlobalVariables.mPinGame = mPinInput.text;
 
         FirebaseDatabase.DefaultInstance.GetReference("games").Child(GlobalVariables.mPinGame).GetValueAsync().ContinueWith(task =>
         {
-            Debug.Log(task.Result.Child("start"));
             DataSnapshot snapshot = task.Result;
             if (snapshot.Child("start").Value.ToString().Equals("False")){
                 GlobalVariables.mGameMode = int.Parse(snapshot.Child("playmode").Value.ToString());
@@ -64,7 +69,20 @@ public class JoinGameScript : MonoBehaviour
             else
             {
                 mPinCorrect = 2;
+                //mJoinButton.interactable = true;
             }
         });
+    }
+
+    public void ActiveButtonJoin()
+    {
+        if(mPinInput.text.Length >= 7)
+            mJoinButton.interactable = true;
+    }
+
+    IEnumerator CourtineCheckDataSave()
+    {
+        yield return new WaitForSeconds(7);
+        mJoinButton.interactable = true;
     }
 }

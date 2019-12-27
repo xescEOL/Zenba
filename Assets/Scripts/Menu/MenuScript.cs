@@ -56,7 +56,7 @@ public class MenuScript : MonoBehaviour
 
         if (GlobalVariables.mUserGames != -999999 && GlobalVariables.mUserPoints != -999999 && !GlobalVariables.mUserName.Equals("") && !mUserNameBool && GlobalVariables.mNumQuizs20 != 0)
         {
-            Debug.Log("100%");
+            //Debug.Log("100%");
             mLoading100 = true;
         }
 
@@ -134,6 +134,7 @@ public class MenuScript : MonoBehaviour
         if (mConfigMenuAnimator != null && mConfigMenuAnimator.GetBool("clickconf") == true)
             mConfigMenuAnimator.SetBool("clickconf", false);
 
+        mJoinGame.transform.GetChild(1).GetComponent<UnityEngine.UI.Button>().enabled = true;
     }
 
     public void ShowFindGame()

@@ -13,13 +13,15 @@ public class PatataScript : MonoBehaviour
     public GameObject mAnswerTxt;
     public GameObject mPistaTxt;
     public GameObject mQuizTxt;
-
+    AudioSource audioData;
     public GameObject mTimeBar;
 
     public int mAnswerUser = -12345678;
 
     private bool mFinish = false;
     private bool mConfirm = false;
+
+    private bool mCorrectAnswer = false;
 
     Animator mAnim;
 
@@ -35,6 +37,7 @@ public class PatataScript : MonoBehaviour
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         mQuizTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = LobbyScript.mQuizTxt;
         mAnim = mTimeBar.transform.GetChild(0).GetComponent<Animator>();
+        audioData = GetComponent<AudioSource>();
         mAnim.SetBool("Start", true);
         StartCoroutine(LoseTime());
     }
@@ -61,20 +64,25 @@ public class PatataScript : MonoBehaviour
     }
     public void ConfirmAnswer()
     {
-        mAnswerUser = int.Parse(mAnswerTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text);
-        mConfirm = true;
-        if (mAnswerUser == LobbyScript.mCorrectAnswer)
+        if (!mFinish)
         {
-            mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "CORRECTO";
-            SaveQuizResult();
-        }
-        else if (mAnswerUser < LobbyScript.mCorrectAnswer)
-        {
-            mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "MÁS";
-        }
-        else if (mAnswerUser > LobbyScript.mCorrectAnswer)
-        {
-            mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "MENOS";
+            audioData.Play(0);
+            mAnswerUser = int.Parse(mAnswerTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text);
+            mConfirm = true;
+            if (mAnswerUser == LobbyScript.mCorrectAnswer)
+            {
+                mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "CORRECTO";
+                mCorrectAnswer = true;
+                SaveQuizResult();
+            }
+            else if (mAnswerUser < LobbyScript.mCorrectAnswer)
+            {
+                mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "MÁS";
+            }
+            else if (mAnswerUser > LobbyScript.mCorrectAnswer)
+            {
+                mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "MENOS";
+            }
         }
     }
 
@@ -86,6 +94,7 @@ public class PatataScript : MonoBehaviour
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(GlobalVariables.mCurrentQuizs);
         GlobalVariables.mCurrentPoints = GlobalVariables.mCurrentPoints + GetPoints(mAnswerUser);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("points").SetValueAsync(GlobalVariables.mCurrentPoints);
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("correctanswer").SetValueAsync(mCorrectAnswer);
         StartCoroutine(Finish());
         //reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(mCurrentRacha);
     }
@@ -166,7 +175,8 @@ public class PatataScript : MonoBehaviour
     {
         yield return new WaitForSeconds(20);
         mFinish = true;
-        mAnswerTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = mAnswerUser.ToString();
+        if(mAnswerUser != -12345678)
+            mAnswerTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = mAnswerUser.ToString();
         mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "+" + GetPoints(mAnswerUser) + "p. Respuesta: " + LobbyScript.mCorrectAnswer;
         SaveQuizResult();
         Debug.Log("finish");

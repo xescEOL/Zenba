@@ -15,6 +15,7 @@ public class PlayerListScript : MonoBehaviour
     private static Firebase.Auth.FirebaseAuth auth;
     public GameObject mSecondsTextGame;
     public GameObject mInfoTextGame;
+    public GameObject mExitButton;
     public LobbyScript mLobby;
     public GameObject mPlayer1;
     public GameObject mPlayer2;
@@ -93,10 +94,10 @@ public class PlayerListScript : MonoBehaviour
         mPlayer13.SetActive(false);
         mPlayer14.SetActive(false);
         mPlayer15.SetActive(false);
-
+        mExitButton.SetActive(false);
         //RetrieveGameValue();
         RetrievePlayersList();
-        
+        StartCoroutine(CourtineCheckDataSave());
         Time.timeScale = 1;
         mprova = true;
     }
@@ -118,6 +119,7 @@ public class PlayerListScript : MonoBehaviour
                 if (!Winner().Equals(""))
                 {
                     mInfoTextGame.GetComponent<UnityEngine.UI.Text>().text = Winner() + " ES EL GANADOR!";
+                    mExitButton.SetActive(true);
                     reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("finish").SetValueAsync(true);
                 }
                 else
@@ -155,6 +157,9 @@ public class PlayerListScript : MonoBehaviour
                 transform.GetChild(cont).transform.GetChild(0).GetComponent<UnityEngine.UI.Text>().text = item.mName;
                 transform.GetChild(cont).transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text = item.mPoints.ToString();
                 transform.GetChild(cont).transform.GetChild(3).GetComponent<UnityEngine.UI.Text>().text = item.mName.Substring(0, 1);
+            if (item.mCurrentQuestion == mCurrentQuestionNoRefresh && item.mCorrectAnswer)
+                transform.GetChild(cont).transform.GetChild(4).GetComponent<UnityEngine.UI.Image>().enabled = true;
+            transform.GetChild(cont).transform.GetChild(5).GetComponent<UnityEngine.UI.Text>().text = item.mCurrentQuestion.ToString();
             cont++;
             }
             mChangeListPlayers = false;
@@ -192,6 +197,8 @@ public class PlayerListScript : MonoBehaviour
                     player.mBonus = user.Child("bonus").Value.ToString().Equals("True");
                 if (user.Child("racha").Value != null)
                     player.mRacha = int.Parse(user.Child("racha").Value.ToString());
+                if (user.Child("correctanswer").Value != null)
+                    player.mCorrectAnswer = user.Child("correctanswer").Value.ToString().Equals("True");
                 mPlayerList.Add(player);
                 mChangeListPlayers = true;
             }
@@ -263,6 +270,24 @@ public class PlayerListScript : MonoBehaviour
         return ret;
     }
 
+    public void CheckDataSave()
+    {
+        if (mPlayerList.Count > 0 && !mStartTime)
+        {
+            int maxCurrent = 0;
+            PlayerInfo myPlayer = new PlayerInfo();
+            foreach (PlayerInfo item in mPlayerList)
+            {
+                if (item.mUid.Equals(auth.CurrentUser.UserId))
+                    myPlayer = item;
+                if (item.mCurrentQuestion > maxCurrent)
+                    maxCurrent = item.mCurrentQuestion;
+            }
+            if(myPlayer.mCurrentQuestion != maxCurrent)
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(maxCurrent);
+        }
+    }
+
     public string Winner()
     {
         string ret = "";
@@ -297,6 +322,16 @@ public class PlayerListScript : MonoBehaviour
         {
             yield return new WaitForSeconds(1);
             mTimeLeft--;
+        }
+    }
+
+    IEnumerator CourtineCheckDataSave()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(15);
+            CheckDataSave();
+            Debug.Log("Check");
         }
     }
 

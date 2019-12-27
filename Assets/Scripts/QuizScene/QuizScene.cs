@@ -24,9 +24,11 @@ public class QuizScene : MonoBehaviour
     public double mAnswerUser;
     public bool mExit = false;
     public float mTimeLeft = 5;
+    public float mTimeQuizLeft = 20;
     public bool mStartTime = false;
     Animator mAnswerAnim;
     private int mCurrentRacha = 0;
+    public GameObject mSecondsTextGame;
 
     private void Awake()
     {
@@ -43,13 +45,16 @@ public class QuizScene : MonoBehaviour
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         mResult.SetActive(false);
+        mSecondsTextGame.GetComponent<UnityEngine.UI.Text>().text = mTimeQuizLeft.ToString("0");
+        Time.timeScale = 1;
+        StartCoroutine(QuizTimeDown());
         mAnswerUser = -12345678;
         mButtonAcceptAnswer.SetActive(false);
         mCurrentRacha = GetCurrentRacha();
         if (mCurrentRacha > 1){ //2
             mButtonBonus50.GetComponent<UnityEngine.UI.Button>().interactable = true;
-            mButtonBonus15.GetComponent<UnityEngine.UI.Button>().interactable = true;
-            mButtonBonusRnd.GetComponent<UnityEngine.UI.Button>().interactable = true;
+            //mButtonBonus15.GetComponent<UnityEngine.UI.Button>().interactable = true;
+            //mButtonBonusRnd.GetComponent<UnityEngine.UI.Button>().interactable = true;
         }
     }
 
@@ -69,7 +74,12 @@ public class QuizScene : MonoBehaviour
                 mStartTime = true;
             }
         }
-        
+        if (mTimeQuizLeft < 0 && !mExit)
+        {
+            mExit = true;
+            ConfirmAnswer();
+        }
+
     }
     public double GenerateOptions(double correctAnswer)
     {
@@ -102,6 +112,7 @@ public class QuizScene : MonoBehaviour
         if (mAnswerUser == LobbyScript.mCorrectAnswer)
         {
             Debug.Log("CORRECT!!!!!");
+            reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("correctanswer").SetValueAsync(true);
             mResult.transform.GetChild(1).gameObject.GetComponent<UnityEngine.UI.Text>().text = "HAS ACERTADO!";
             if (mCurrentRacha < 3)
                 mCurrentRacha++;
@@ -115,6 +126,7 @@ public class QuizScene : MonoBehaviour
         else
         {
             Debug.Log("WRONG ANSWER!!!!!");
+            reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("correctanswer").SetValueAsync(false);
             mResult.transform.GetChild(1).gameObject.GetComponent<UnityEngine.UI.Text>().text = "La respuesta correcta es:";
             
         }
@@ -219,6 +231,7 @@ public class QuizScene : MonoBehaviour
 
     public void BonusRndLaunch()
     {
+        mButtonBonus50.GetComponent<UnityEngine.UI.Button>().interactable = false;
         int cont = 0;
         List<int> rndList = new List<int>();
         while (cont < 10)
@@ -243,6 +256,20 @@ public class QuizScene : MonoBehaviour
         yield return new WaitForSeconds(4);
         Debug.Log("lOBBY");
         SceneManager.LoadScene("LobbyGame");
+    }
+
+    IEnumerator QuizTimeDown()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            if (!mExit)
+            {
+                mTimeQuizLeft--;
+                if (mTimeQuizLeft >= 0)
+                    mSecondsTextGame.GetComponent<UnityEngine.UI.Text>().text = mTimeQuizLeft.ToString("0");
+            }
+        }
     }
 
 }

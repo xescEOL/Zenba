@@ -88,6 +88,11 @@ public class LobbyScript : MonoBehaviour
         auth.SignOut();
     }
 
+    public void Exit()
+    {
+        SceneManager.LoadScene("Menu");
+    }
+
     public bool CorrectQuestion()
     {
         return ((((mMaxOption - mCorrectAnswer) / mVariant) + ((mCorrectAnswer - mMinOption) / mVariant)) >= 20) & mMaxOption > mCorrectAnswer & mMinOption < mCorrectAnswer;

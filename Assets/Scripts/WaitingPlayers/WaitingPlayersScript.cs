@@ -46,12 +46,6 @@ public class WaitingPlayersScript : MonoBehaviour
     private void Awake()
     {
         mStartButton.gameObject.SetActive(false);
-        mPinText.text = "PIN: " + GlobalVariables.mPinGame;
-        if (CreateScript.mAdmin)
-        {
-            mCurrentUserAdmin = true;
-            mStartButton.gameObject.SetActive(true);
-        }
     }
     // Start is called before the first frame update
     void Start()
@@ -75,6 +69,13 @@ public class WaitingPlayersScript : MonoBehaviour
         mPlayer14.SetActive(false);
         mPlayer15.SetActive(false);
 
+        mPinText.text = "PIN: " + GlobalVariables.mPinGame;
+        if (GlobalVariables.mGameAdminUId.Equals(auth.CurrentUser.UserId))
+        {
+            mCurrentUserAdmin = true;
+            mStartButton.gameObject.SetActive(true);
+        }
+
         RetrieveGameValue();
         RetrievePlayersList();
     }
@@ -86,10 +87,6 @@ public class WaitingPlayersScript : MonoBehaviour
         if (mStart)
         {
             SceneManager.LoadScene("LobbyGame");
-        }
-        if (mCurrentUserAdmin)
-        {
-            mStartButton.gameObject.SetActive(true);
         }
     }
     private void RefreshList()
@@ -114,6 +111,12 @@ public class WaitingPlayersScript : MonoBehaviour
     public void CreateClick()
     {
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("start").SetValueAsync(true);
+    }
+
+    public void Exit()
+    {
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).RemoveValueAsync();
+        SceneManager.LoadScene("Menu");
     }
 
     public void RetrievePlayersList() //from the database (server)...
