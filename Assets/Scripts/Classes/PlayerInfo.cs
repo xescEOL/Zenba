@@ -9,4 +9,5 @@ public class PlayerInfo
     public int mRacha = 0;
     public bool mBonus = false;
     public bool mCorrectAnswer = false;
+    public int mEmoji = 0;
 }

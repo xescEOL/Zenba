@@ -71,6 +71,7 @@ public class CreateScript : MonoBehaviour
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(false);
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(mNameGame.text);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("bonus").SetValueAsync(0);
@@ -98,6 +99,7 @@ public class CreateScript : MonoBehaviour
     public void CreateListQuizs()
     {
         int numlist = 1;
+        GlobalVariables.mListQuizs.Clear();
         while (numlist <= int.Parse(mDropDown.options[mDropDown.value].text))
         {
             int rnd = new System.Random().Next(1, GlobalVariables.mNumQuizs20);

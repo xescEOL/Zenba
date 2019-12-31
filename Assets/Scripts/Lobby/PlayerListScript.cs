@@ -40,12 +40,6 @@ public class PlayerListScript : MonoBehaviour
 
     public bool mStart = false;
     public static int mCurrentQuestionNoRefresh = -1;
-    /*public int mGameMode = 0;
-    public int mWinMode = 0;
-    public int mWinValue = 99999;
-    public string mAdminUId;
-    public string mNameGame;*/
-    private bool mprova = false;
     public float mTimeLeft = 9;
 
     public bool mStartTime = false;
@@ -99,7 +93,6 @@ public class PlayerListScript : MonoBehaviour
         RetrievePlayersList();
         StartCoroutine(CourtineCheckDataSave());
         Time.timeScale = 1;
-        mprova = true;
     }
 
     // Update is called once per frame
@@ -129,12 +122,10 @@ public class PlayerListScript : MonoBehaviour
                         //mCurrentQuestion++;
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(mCurrentQuestionNoRefresh + 1);
                         //StopAllCoroutines();
-                        mprova = false;
                         mLobby.StartQuiz();
                     }
                     mSecondsTextGame.SetActive(true);
                     mSecondsTextGame.GetComponent<UnityEngine.UI.Text>().text = mTimeLeft.ToString("0");
-                    //mTimeLeft -= Time.fixedDeltaTime;
                     if (!mStartTime)
                     {
                         StartCoroutine(LoseTime());
@@ -159,7 +150,18 @@ public class PlayerListScript : MonoBehaviour
                 transform.GetChild(cont).transform.GetChild(3).GetComponent<UnityEngine.UI.Text>().text = item.mName.Substring(0, 1);
             if (item.mCurrentQuestion == mCurrentQuestionNoRefresh && item.mCorrectAnswer)
                 transform.GetChild(cont).transform.GetChild(4).GetComponent<UnityEngine.UI.Image>().enabled = true;
+            else
+                transform.GetChild(cont).transform.GetChild(4).GetComponent<UnityEngine.UI.Image>().enabled = false;
             transform.GetChild(cont).transform.GetChild(5).GetComponent<UnityEngine.UI.Text>().text = item.mCurrentQuestion.ToString();
+            if (item.mEmoji != 0)
+            {
+                transform.GetChild(cont).transform.GetChild(6).gameObject.SetActive(true);
+                transform.GetChild(cont).transform.GetChild(6).GetComponent<UnityEngine.UI.Image>().sprite = GetSprite(item.mEmoji);
+            }
+            else
+            {
+                transform.GetChild(cont).transform.GetChild(6).gameObject.SetActive(false);
+            }
             cont++;
             }
             mChangeListPlayers = false;
@@ -181,7 +183,7 @@ public class PlayerListScript : MonoBehaviour
         }
         // Do something with the data in args.Snapshot
         mPlayerList.Clear();
-        if (mprova)
+        if (mTimeLeft >= 1)
         {
             foreach (DataSnapshot user in args.Snapshot.Children)
             {
@@ -199,38 +201,13 @@ public class PlayerListScript : MonoBehaviour
                     player.mRacha = int.Parse(user.Child("racha").Value.ToString());
                 if (user.Child("correctanswer").Value != null)
                     player.mCorrectAnswer = user.Child("correctanswer").Value.ToString().Equals("True");
+                if (user.Child("emoji").Value != null)
+                    player.mEmoji = int.Parse(user.Child("emoji").Value.ToString());
                 mPlayerList.Add(player);
                 mChangeListPlayers = true;
             }
         }
     }
-
-    /*public void RetrieveGameValue() //from the database (server)...
-    {
-        FirebaseDatabase.DefaultInstance
-        .GetReference("games").Child(GlobalVariables.mPinGame)
-        .ValueChanged += GameValuesHandleValueChanged;
-    }
-    void GameValuesHandleValueChanged(object sender, ValueChangedEventArgs args)
-    {
-        if (args.DatabaseError != null)
-        {
-            Debug.LogError(args.DatabaseError.Message);
-            return;
-        }
-        // Do something with the data in args.Snapshot
-        DataSnapshot game = args.Snapshot;
-        Debug.Log("GameData: currentgame - " + game.Child("currentgame").Value + " - kids - " + game.Child("kids").Value + " - playmode - " + game.Child("playmode").Value + " - start - " + game.Child("start").Value + " - winmode - " + game.Child("winmode").Value + " - winvalue - " + game.Child("winvalue").Value);
-
-        mStart = game.Child("start").Value.ToString().Equals("True");
-        mGameMode = int.Parse(game.Child("playmode").Value.ToString());
-        mWinMode = int.Parse(game.Child("winmode").Value.ToString());
-        mWinValue = int.Parse(game.Child("winvalue").Value.ToString());
-        mAdminUId = game.Child("admin").Value.ToString();
-        mNameGame = game.Child("name").Value.ToString();
-        if (mAdminUId.Equals(auth.CurrentUser.UserId))
-            mCurrentUserAdmin = true;
-    }*/
 
     public void ResetListPlayers()
     {
@@ -313,6 +290,57 @@ public class PlayerListScript : MonoBehaviour
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("currentquestion").SetValueAsync(mCurrentQuestionNoRefresh);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("finish").SetValueAsync(false);
         reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("players").SetValueAsync(mPlayerList.Count);
+    }
+
+    public Sprite GetSprite(int pSprite)
+    {
+        switch (pSprite)
+        {
+            case 1:
+                return Resources.Load<Sprite>("Emojis/Pack1/emocionado");
+            case 2:
+                return Resources.Load<Sprite>("Emojis/Pack1/partido");
+            case 3:
+                return Resources.Load<Sprite>("Emojis/Pack1/angel");
+            case 4:
+                return Resources.Load<Sprite>("Emojis/Pack1/diablo");
+            case 5:
+                return Resources.Load<Sprite>("Emojis/Pack1/aversion");
+            case 6:
+                return Resources.Load<Sprite>("Emojis/Pack1/riendo");
+            case 7:
+                return Resources.Load<Sprite>("Emojis/Pack1/empollon");
+            case 8:
+                return Resources.Load<Sprite>("Emojis/Pack1/enojado");
+            case 9:
+                return Resources.Load<Sprite>("Emojis/Pack1/rock");
+            case 10:
+                return Resources.Load<Sprite>("Emojis/Pack1/detective");
+            case 11:
+                return Resources.Load<Sprite>("Emojis/Pack1/fresco");
+            case 12:
+                return Resources.Load<Sprite>("Emojis/Pack1/espantado");
+            case 13:
+                return Resources.Load<Sprite>("Emojis/Pack1/decepcion");
+            case 14:
+                return Resources.Load<Sprite>("Emojis/Pack1/mudo");
+            case 15:
+                return Resources.Load<Sprite>("Emojis/Pack1/bostezando");
+            case 16:
+                return Resources.Load<Sprite>("Emojis/Pack1/estupido");
+            case 17:
+                return Resources.Load<Sprite>("Emojis/Pack1/llanto");
+            case 18:
+                return Resources.Load<Sprite>("Emojis/Pack1/gato");
+            default:
+                return Resources.Load<Sprite>("Emojis/Pack1/angel");
+        }
+
+    }
+
+    public void SetEmoji(int pEmojiNum)
+    {
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(pEmojiNum);
     }
 
     //Countdown Thread
