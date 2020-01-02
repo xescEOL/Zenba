@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using Firebase;
+using Firebase.Database;
+using Firebase.Unity.Editor;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,6 +9,7 @@ using UnityEngine.UI;
 
 public class MenuScript : MonoBehaviour
 {
+    private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
     private bool mUserNameBool = false;
     private bool mLoading100 = false;
@@ -34,6 +38,8 @@ public class MenuScript : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
+        reference = FirebaseDatabase.DefaultInstance.RootReference;
         mLoading.SetActive(true);
         mPrincipalMenu.SetActive(false);
         mTopBar.SetActive(false);
@@ -145,5 +151,18 @@ public class MenuScript : MonoBehaviour
     public void SignOut()
     {
         auth.SignOut();
+        SceneManager.LoadScene("Login");
+    }
+
+    public void ChangeNameConf()
+    {
+        reference.Child("users").Child(auth.CurrentUser.UserId).Child("name").SetValueAsync(mUserNameInput.text);
+        GlobalVariables.mUserName = mUserNameInput.text;
+        mNameTopBar.text = GlobalVariables.mUserName;
+    }
+
+    public void ExitApp()
+    {
+        Application.Quit();
     }
 }

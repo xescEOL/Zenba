@@ -8,64 +8,109 @@ using UnityEngine.SceneManagement;
 
 public class FindGameScript : MonoBehaviour
 {
+    private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
-    public GameObject[] mCurrentGames;
-    public List<GameInfo> mGamesList = new List<GameInfo>();
-
-    private void Awake()
-    {
-        foreach(GameObject item in mCurrentGames)
-        {
-            item.SetActive(false);
-        }
-    }
-
     // Start is called before the first frame update
     void Start()
     {
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
-        //reference = FirebaseDatabase.DefaultInstance.RootReference;
+        reference = FirebaseDatabase.DefaultInstance.RootReference;
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
-        GetCurrentGames();
     }
 
     // Update is called once per frame
     void Update()
     {
-        int cont = 0;
-        foreach (GameInfo item in mGamesList)
-        {
-            mCurrentGames[cont].SetActive(true);
-            mCurrentGames[cont].transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text = item.mName;
-            mCurrentGames[cont].transform.GetChild(3).GetComponent<UnityEngine.UI.Text>().text = item.mPlayers.ToString();
-            mCurrentGames[cont].transform.GetChild(5).GetComponent<UnityEngine.UI.Text>().text = item.mCurrentQuestion.ToString();
-            cont++;
-        }
-
+        
+    }
+    public void Exit()
+    {
+        SceneManager.LoadScene("Menu");
     }
 
-    public void GetCurrentGames()
+    public void FindGame()
     {
-        FirebaseDatabase.DefaultInstance.GetReference("users").Child(auth.CurrentUser.UserId).Child("currentgames").GetValueAsync().ContinueWith(task =>
+        RetrieveInfo();
+    }
+
+    public void RetrieveInfo() //from the database (server)...
+    {
+        //Retrieve the data and convert it to string...
+        FirebaseDatabase.DefaultInstance.GetReference("findgames").GetValueAsync().ContinueWith(task =>
         {
-            foreach (DataSnapshot user in task.Result.Children)
+            if (task.IsFaulted)
             {
-                GameInfo game = new GameInfo();
-                game.mPin = user.Key;
-                game.mName = user.Child("name").Value.ToString();
-                game.mFinish = user.Child("name").Value.ToString() == "True";
-                game.mCurrentQuestion = int.Parse(user.Child("currentquestion").Value.ToString());
-                game.mPlayers = int.Parse(user.Child("players").Value.ToString());
-                Debug.Log(game.mPin + " - " + game.mName);
-                mGamesList.Add(game);
+                // Handle the error...
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot levelSnapshot = task.Result;
+                if (task.Result.ChildrenCount != 0)
+                {
+                    foreach (DataSnapshot childSnapshot in levelSnapshot.Children)
+                    {
+                        GlobalVariables.mPinGame = childSnapshot.Key;
+                        reference.Child("findgames").Child(GlobalVariables.mPinGame).Child("players").SetValueAsync(int.Parse(childSnapshot.Child("players").Value.ToString()) + 1);
+                        if (int.Parse(childSnapshot.Child("players").Value.ToString()) > 10)
+                        {
+                            reference.Child("findgames").Child(GlobalVariables.mPinGame).RemoveValueAsync();
+                        }
+                        GlobalVariables.mGameName = "_findgame";
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("points").SetValueAsync(0);
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("name").SetValueAsync(GlobalVariables.mUserName);
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(0);
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(false);
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(0);
+                        SceneManager.LoadScene("WaitingPlayers");
+                    }
+                }
+                else
+                {
+                    GlobalVariables.mPinGame = Random.Range(00000001, 99999999).ToString("D8");
+                    reference.Child("findgames").Child(GlobalVariables.mPinGame).Child("players").SetValueAsync(1);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("admin").SetValueAsync(auth.CurrentUser.UserId);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("kids").SetValueAsync(false);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("playmode").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("winmode").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("winvalue").SetValueAsync(10);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("start").SetValueAsync(false);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("points").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("name").SetValueAsync(GlobalVariables.mUserName);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(false);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(GlobalVariables.mPinGame);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("bonus").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("findgame").SetValueAsync(true);
+                    GlobalVariables.mGameAdminUId = auth.CurrentUser.UserId;
+                    GlobalVariables.mGameMode = 0;
+                    GlobalVariables.mGameName = GlobalVariables.mPinGame;
+                    GlobalVariables.mGameWinMode = 0;
+                    GlobalVariables.mGameWinValue = 10;
+                    CreateListQuizs();
+                    SceneManager.LoadScene("WaitingPlayers");
+                }
             }
         });
-
     }
 
-    public void ShowGame(int pGameNumber)
+    public void CreateListQuizs()
     {
-        GlobalVariables.mPinGame = mGamesList[pGameNumber].mPin;
-        SceneManager.LoadScene("LobbyGame");
+        int numlist = 1;
+        GlobalVariables.mListQuizs.Clear();
+        while (numlist <= 10)
+        {
+            int rnd = new System.Random().Next(1, GlobalVariables.mNumQuizs20);
+            if (!GlobalVariables.mListQuizs.Contains(rnd + "_0") && !GlobalVariables.mListQuizs.Contains(rnd + "_1"))
+            {
+                int rnd2 = new System.Random().Next(0, 2);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("list").Child(numlist.ToString()).SetValueAsync(rnd + "_" + rnd2).ToString();
+                GlobalVariables.mListQuizs.Add(rnd + "_" + rnd2);
+                numlist++;
+            }
+        }
     }
 }

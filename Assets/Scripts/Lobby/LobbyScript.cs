@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 
@@ -19,6 +20,7 @@ public class LobbyScript : MonoBehaviour
     public static double mVariant = -999999;
     public static double mMaxOption = -999999;
     public static double mMinOption = -999999;
+    public Text mDebugtxt;
     public bool mRetrieveDB = false;
     public long mCountQuizs = 0;
     public int mTipoQuiz = 0;
@@ -55,7 +57,13 @@ public class LobbyScript : MonoBehaviour
                 SceneManager.LoadScene("QuizPatata");
         }
         else if (mRetrieveDB & !CorrectQuestion())
+        {
             Debug.Log("Question NOT correct");
+            mDebugtxt.text = GlobalVariables.mListQuizs[GlobalVariables.mCurrentQuizs] + " - Question NOT correct";
+            mMinOption = 1;
+            mMaxOption = 99999999;
+            SceneManager.LoadScene("Quiz20");
+        }
     }
 
     public void RetrieveData(string pReference) //from the database (server)...

@@ -357,7 +357,7 @@ public class PlayerListScript : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(15);
+            yield return new WaitForSeconds(32);
             CheckDataSave();
             Debug.Log("Check");
         }

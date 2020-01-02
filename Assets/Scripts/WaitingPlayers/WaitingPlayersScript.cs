@@ -41,6 +41,7 @@ public class WaitingPlayersScript : MonoBehaviour
     public bool mkids;
     public string mAdminUId;
     public string mNameGame;
+    public bool mPublicGame = false;
 
 
     private void Awake()
@@ -69,8 +70,14 @@ public class WaitingPlayersScript : MonoBehaviour
         mPlayer14.SetActive(false);
         mPlayer15.SetActive(false);
 
+        if (GlobalVariables.mGameName.Equals("_findgame"))
+        {
+            mPublicGame = true;
+            GetInfoGame();
+        }
+
         mPinText.text = "PIN: " + GlobalVariables.mPinGame;
-        if (GlobalVariables.mGameAdminUId.Equals(auth.CurrentUser.UserId))
+        if (GlobalVariables.mGameAdminUId.Equals(auth.CurrentUser.UserId) && !mPublicGame)
         {
             mCurrentUserAdmin = true;
             mStartButton.gameObject.SetActive(true);
@@ -86,6 +93,7 @@ public class WaitingPlayersScript : MonoBehaviour
         RefreshList();
         if (mStart)
         {
+            reference.Child("findgames").Child(GlobalVariables.mPinGame).RemoveValueAsync();
             SceneManager.LoadScene("LobbyGame");
         }
     }
@@ -190,5 +198,27 @@ public class WaitingPlayersScript : MonoBehaviour
         mPlayer13.SetActive(false);
         mPlayer14.SetActive(false);
         mPlayer15.SetActive(false);
+    }
+
+    public void GetInfoGame()
+    {
+            FirebaseDatabase.DefaultInstance.GetReference("games").Child(GlobalVariables.mPinGame).GetValueAsync().ContinueWith(task =>
+            {
+                DataSnapshot snapshot = task.Result;
+                if (snapshot.Child("start").Value.ToString().Equals("False"))
+                {
+                    GlobalVariables.mGameMode = int.Parse(snapshot.Child("playmode").Value.ToString());
+                    GlobalVariables.mGameWinMode = int.Parse(snapshot.Child("winmode").Value.ToString());
+                    GlobalVariables.mGameWinValue = int.Parse(snapshot.Child("winvalue").Value.ToString());
+                    GlobalVariables.mGameAdminUId = snapshot.Child("admin").Value.ToString();
+                    GlobalVariables.mGameName = snapshot.Child("name").Value.ToString();
+                    GlobalVariables.mCurrentPoints = 0;
+                    GlobalVariables.mListQuizs.Clear();
+                    for (int i = 1; i <= GlobalVariables.mNumQuizs20; i++)
+                    {
+                        GlobalVariables.mListQuizs.Add(snapshot.Child("list").Child(i.ToString()).Value.ToString());
+                    }
+                }
+            });
     }
 }
