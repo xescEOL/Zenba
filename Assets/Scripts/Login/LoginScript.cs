@@ -26,6 +26,7 @@ public class LoginScript : MonoBehaviour
         if (auth.CurrentUser != null)
         {
             Debug.Log("session abierta");
+            Debug.Log("Application Version : " + Application.version);
             SceneManager.LoadScene("Menu");
         }
     }
@@ -144,6 +145,5 @@ public class LoginScript : MonoBehaviour
         auth.StateChanged -= AuthStateChanged;
         auth = null;
     }
-
 
 }

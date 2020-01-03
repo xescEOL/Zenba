@@ -13,6 +13,7 @@ public class MenuScript : MonoBehaviour
     private static Firebase.Auth.FirebaseAuth auth;
     private bool mUserNameBool = false;
     private bool mLoading100 = false;
+    private bool mCurrentVersionInstalled = false;
 
     public GameObject mLoading;
     public GameObject mPrincipalMenu;
@@ -21,9 +22,11 @@ public class MenuScript : MonoBehaviour
     public GameObject mConfigMenu;
     public GameObject mBackMenu;
     public GameObject mTopBar;
+    public GameObject mPopup;
     public InputField mUserNameInput;
     public Text mNameTopBar;
     public Text mLevelTopBar;
+    public Text mAppInfo;
     Animator mPrincipalMenuAnimator;
     Animator mCreateAnimator;
     Animator mJoinGameAnimator;
@@ -40,6 +43,8 @@ public class MenuScript : MonoBehaviour
     {
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         reference = FirebaseDatabase.DefaultInstance.RootReference;
+        mAppInfo.text = "Zenba 2020 - Ver: " + Application.version;
+        GetCurrentVersion();
         mLoading.SetActive(true);
         mPrincipalMenu.SetActive(false);
         mTopBar.SetActive(false);
@@ -49,6 +54,7 @@ public class MenuScript : MonoBehaviour
         mJoinGameAnimator = mJoinGame.GetComponent<Animator>();
         mConfigMenuAnimator = mConfigMenu.GetComponent<Animator>();
         mBackMenuAnimator = mBackMenu.GetComponent<Animator>();
+        GlobalVariables.ResetVariables();
     }
 
     // Update is called once per frame
@@ -60,7 +66,7 @@ public class MenuScript : MonoBehaviour
             LoadingImg.texture = frames[index];
         }
 
-        if (GlobalVariables.mUserGames != -999999 && GlobalVariables.mUserPoints != -999999 && !GlobalVariables.mUserName.Equals("") && !mUserNameBool && GlobalVariables.mNumQuizs20 != 0)
+        if (GlobalVariables.mUserGames != -999999 && GlobalVariables.mUserPoints != -999999 && !GlobalVariables.mUserName.Equals("") && !mUserNameBool && GlobalVariables.mNumQuizs20 != 0 && mCurrentVersionInstalled)
         {
             //Debug.Log("100%");
             mLoading100 = true;
@@ -164,5 +170,31 @@ public class MenuScript : MonoBehaviour
     public void ExitApp()
     {
         Application.Quit();
+    }
+
+    public void GetCurrentVersion()
+    {
+        FirebaseDatabase.DefaultInstance.GetReference("appinfo").GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsFaulted)
+            {
+                // Handle the error...
+                Debug.Log("error retrieve version");
+            }
+            else if (task.IsCompleted)
+            {
+                DataSnapshot levelSnapshot = task.Result;
+                if (levelSnapshot.Child("version").Value.ToString().Equals(Application.version))
+                {
+                    auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+                    if (auth.CurrentUser != null)
+                    {
+                        mCurrentVersionInstalled = true;
+                    }
+                }
+                else
+                    mPopup.SetActive(true);
+            }
+        });
     }
 }

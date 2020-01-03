@@ -72,6 +72,7 @@ public class CreateScript : MonoBehaviour
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(false);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(0);
+        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("boot").SetValueAsync(false);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(0);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(mNameGame.text);
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("bonus").SetValueAsync(0);

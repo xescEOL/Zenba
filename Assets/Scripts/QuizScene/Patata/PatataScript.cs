@@ -5,11 +5,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PatataScript : MonoBehaviour
 {
     private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
+    public Button mBotonConf;
+    public Button mBotonReset;
     public GameObject mAnswerTxt;
     public GameObject mPistaTxt;
     public GameObject mQuizTxt;
@@ -71,6 +74,8 @@ public class PatataScript : MonoBehaviour
             mConfirm = true;
             if (mAnswerUser == LobbyScript.mCorrectAnswer)
             {
+                mBotonConf.interactable = false;
+                mBotonReset.interactable = false;
                 mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "CORRECTO";
                 mCorrectAnswer = true;
                 SaveQuizResult();
@@ -175,7 +180,9 @@ public class PatataScript : MonoBehaviour
     {
         yield return new WaitForSeconds(20);
         mFinish = true;
-        if(mAnswerUser != -12345678)
+        mBotonConf.interactable = false;
+        mBotonReset.interactable = false;
+        if (mAnswerUser != -12345678)
             mAnswerTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = mAnswerUser.ToString();
         mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "+" + GetPoints(mAnswerUser) + "p. Respuesta: " + LobbyScript.mCorrectAnswer;
         SaveQuizResult();

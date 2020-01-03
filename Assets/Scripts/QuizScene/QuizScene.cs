@@ -86,7 +86,11 @@ public class QuizScene : MonoBehaviour
         double ret = -12345678;
         while (ret == -12345678 | LobbyScript.mMaxOption < (ret + (LobbyScript.mVariant * 20)) | LobbyScript.mMinOption > ret)
         {
-            int randomPosition = Random.Range(1, 20);
+            int randomPosition = Random.Range(1, 21);
+            if(Random.Range(0, 3) == 1 && randomPosition < 10)
+            {
+                randomPosition = 20 - randomPosition;
+            }
             ret = correctAnswer - (LobbyScript.mVariant * randomPosition);
         }
         return ret;

@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
 public class WaitingPlayersScript : MonoBehaviour
 {
     private static DatabaseReference reference;
@@ -54,6 +55,7 @@ public class WaitingPlayersScript : MonoBehaviour
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+        Time.timeScale = 1;
         mPlayer1.SetActive(false);
         mPlayer2.SetActive(false);
         mPlayer3.SetActive(false);
@@ -74,9 +76,15 @@ public class WaitingPlayersScript : MonoBehaviour
         {
             mPublicGame = true;
             GetInfoGame();
+            mPinText.text = "Esperando jugadores...";
+            StartCoroutine(AddBot());
+        }
+        else
+        {
+            mPinText.text = "PIN: " + GlobalVariables.mPinGame;
         }
 
-        mPinText.text = "PIN: " + GlobalVariables.mPinGame;
+        
         if (GlobalVariables.mGameAdminUId.Equals(auth.CurrentUser.UserId) && !mPublicGame)
         {
             mCurrentUserAdmin = true;
@@ -92,6 +100,10 @@ public class WaitingPlayersScript : MonoBehaviour
     {
         RefreshList();
         if (mStart)
+        {
+            SceneManager.LoadScene("LobbyGame");
+        }
+        if (mPublicGame && mPlayerList.Count >= 5)
         {
             reference.Child("findgames").Child(GlobalVariables.mPinGame).RemoveValueAsync();
             SceneManager.LoadScene("LobbyGame");
@@ -124,6 +136,7 @@ public class WaitingPlayersScript : MonoBehaviour
     public void Exit()
     {
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).RemoveValueAsync();
+        reference.Child("findgames").Child(GlobalVariables.mPinGame).RemoveValueAsync();
         SceneManager.LoadScene("Menu");
     }
 
@@ -221,4 +234,25 @@ public class WaitingPlayersScript : MonoBehaviour
                 }
             });
     }
+
+    IEnumerator AddBot()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(mPlayerList.Count + UnityEngine.Random.Range(1, 10));
+            if(mPlayerList.Count < 5)
+            {
+                BotsName names = new BotsName();
+                int rnd = UnityEngine.Random.Range(0, names.mNames.Count);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("points").SetValueAsync(0);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("name").SetValueAsync(names.mNames[rnd]);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("currentquestion").SetValueAsync(0);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("racha").SetValueAsync(0);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("bonus").SetValueAsync(false);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("emoji").SetValueAsync(0);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(names.mNames[rnd]).Child("boot").SetValueAsync(true);
+            }
+        }
+    }
+
 }

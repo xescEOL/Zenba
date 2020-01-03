@@ -10,4 +10,5 @@ public class PlayerInfo
     public bool mBonus = false;
     public bool mCorrectAnswer = false;
     public int mEmoji = 0;
+    public bool mBoot = false;
 }

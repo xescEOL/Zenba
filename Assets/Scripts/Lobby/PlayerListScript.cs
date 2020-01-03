@@ -35,6 +35,8 @@ public class PlayerListScript : MonoBehaviour
     public GameObject mListPlayers;
     public GameObject mNumQuizTxt;
     public bool mChangeListPlayers = false;
+    public Text mCommentary;
+    public Text mCommentary2;
     public static List<PlayerInfo> mPlayerList = new List<PlayerInfo>();
     public bool mCurrentUserAdmin = false;
 
@@ -92,7 +94,21 @@ public class PlayerListScript : MonoBehaviour
         //RetrieveGameValue();
         RetrievePlayersList();
         StartCoroutine(CourtineCheckDataSave());
+        StartCoroutine(PlayBootCourtine());
         Time.timeScale = 1;
+        int rnd = UnityEngine.Random.Range(1, 6);
+        if (rnd == 1)
+            mCommentary.text = "Parece que hay jugadores que tardan mucho en contestar...";
+        else if (rnd == 2)
+            mCommentary.text = "¡Mejor esperamos a que contesten todos los jugadores antes de comentar!";
+        else if (rnd == 3)
+            mCommentary.text = "Recuerda que dispones de más tiempo para pensar las respuestas, tus rivales todavía están contestando";
+        else if (rnd == 4)
+            mCommentary.text = "No te pongas nervioso, los otros concursantes tardan más que tú en contestar...";
+        else if (rnd == 5)
+            mCommentary.text = "Esperando a los demás jugadores, espera un poquito";
+        else if (rnd == 6)
+            mCommentary.text = "No te hagas ilusiones, cuando contesten todos los concursantes, puede que bajes alguna posición...";
     }
 
     // Update is called once per frame
@@ -109,9 +125,13 @@ public class PlayerListScript : MonoBehaviour
             SaveCurrentGame();
             if (AllUsersPlay())
             {
+                if(mPlayerList.Count<12)
+                    mCommentary.text = GetCommentary();
+                else
+                    mCommentary2.text = GetCommentary();
                 if (!Winner().Equals(""))
                 {
-                    mInfoTextGame.GetComponent<UnityEngine.UI.Text>().text = Winner() + " ES EL GANADOR!";
+                    //mInfoTextGame.GetComponent<UnityEngine.UI.Text>().text = Winner() + " ES EL GANADOR!";
                     mExitButton.SetActive(true);
                     reference.Child("users").Child(auth.CurrentUser.UserId).Child("currentgames").Child(GlobalVariables.mPinGame).Child("finish").SetValueAsync(true);
                 }
@@ -122,6 +142,7 @@ public class PlayerListScript : MonoBehaviour
                         //mCurrentQuestion++;
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(mCurrentQuestionNoRefresh + 1);
                         //StopAllCoroutines();
+                        SaveLastPositions();
                         mLobby.StartQuiz();
                     }
                     mSecondsTextGame.SetActive(true);
@@ -162,6 +183,10 @@ public class PlayerListScript : MonoBehaviour
             {
                 transform.GetChild(cont).transform.GetChild(6).gameObject.SetActive(false);
             }
+            if (item.mUid.Equals(auth.CurrentUser.UserId))
+                transform.GetChild(cont).GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+            else
+                transform.GetChild(cont).GetComponent<UnityEngine.UI.Image>().color = Color.white;
             cont++;
             }
             mChangeListPlayers = false;
@@ -203,6 +228,8 @@ public class PlayerListScript : MonoBehaviour
                     player.mCorrectAnswer = user.Child("correctanswer").Value.ToString().Equals("True");
                 if (user.Child("emoji").Value != null)
                     player.mEmoji = int.Parse(user.Child("emoji").Value.ToString());
+                if (user.Child("boot").Value != null)
+                    player.mBoot = user.Child("boot").Value.ToString().Equals("True");
                 mPlayerList.Add(player);
                 mChangeListPlayers = true;
             }
@@ -252,16 +279,16 @@ public class PlayerListScript : MonoBehaviour
         if (mPlayerList.Count > 0 && !mStartTime)
         {
             int maxCurrent = 0;
-            PlayerInfo myPlayer = new PlayerInfo();
             foreach (PlayerInfo item in mPlayerList)
             {
-                if (item.mUid.Equals(auth.CurrentUser.UserId))
-                    myPlayer = item;
                 if (item.mCurrentQuestion > maxCurrent)
                     maxCurrent = item.mCurrentQuestion;
             }
-            if(myPlayer.mCurrentQuestion != maxCurrent)
-                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(maxCurrent);
+            foreach (PlayerInfo item in mPlayerList)
+            {
+                if (item.mCurrentQuestion != maxCurrent)
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(item.mUid).Child("currentquestion").SetValueAsync(maxCurrent);
+            }    
         }
     }
 
@@ -343,6 +370,138 @@ public class PlayerListScript : MonoBehaviour
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(pEmojiNum);
     }
 
+    public void BootPlay()
+    {
+            int rnd2 = UnityEngine.Random.Range(0, mPlayerList.Count);
+            if (mPlayerList[rnd2].mBoot && mPlayerList[rnd2].mCurrentQuestion < mCurrentQuestionNoRefresh)
+            {
+                int rnd = UnityEngine.Random.Range(0, 23);
+                if (rnd == 21 || rnd == 19)
+                    rnd = 20;
+                else if (rnd == 22)
+                    rnd = 0;
+                else if (rnd == 18 || rnd == 17 || rnd == 16)
+                    rnd = 15;
+                else if (rnd == 14)
+                    rnd = 13;
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(mPlayerList[rnd2].mUid).Child("currentquestion").SetValueAsync(mPlayerList[rnd2].mCurrentQuestion + 1);
+                reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(mPlayerList[rnd2].mUid).Child("points").SetValueAsync(mPlayerList[rnd2].mPoints + rnd);
+                if(rnd == 20)
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(mPlayerList[rnd2].mUid).Child("correctanswer").SetValueAsync(true);
+                else
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(mPlayerList[rnd2].mUid).Child("correctanswer").SetValueAsync(false);
+                return;
+            }
+    }
+
+    public string GetCommentary()
+    {
+        List<int> positionsChange = new List<int>();
+        List<string> playersCorrect = new List<string>();
+        List<string> playersNoCorrect = new List<string>();
+        string winPos = "";
+        string lostPos = "";
+        int posCurrent = 1;
+        foreach (PlayerInfo item in mPlayerList)
+        {
+            if (item.mCorrectAnswer)
+                playersCorrect.Add(item.mName);
+            else
+                playersNoCorrect.Add(item.mName);
+            int poslast = 1;
+            foreach (string item2 in GlobalVariables.mPositionsLastPlay)
+            {
+                if (item2.Equals(item.mName))
+                    positionsChange.Add(poslast - posCurrent);
+                poslast++;
+            }
+            posCurrent++;
+        }
+        int max = 0;
+        int min = 0;
+        int posList = 0;
+        foreach (int num in positionsChange)
+        {
+            if (num > max)
+            {
+                max = num;
+                winPos = mPlayerList[posList].mName;
+            }
+            if (num < min)
+            {
+                min = num;
+                lostPos = mPlayerList[posList].mName;
+            }
+            posList++;
+        }
+        if (mCurrentQuestionNoRefresh == 0 && mPlayerList.Count > 1)
+            return "Bienvenidos a una partida de Zenba! Hoy tenemos un interesantisimo duelo entre " + mPlayerList.Count + " concursantes. Mucha suerte a todos los participantes. ¡EMPEZAMOS!";
+        if (mCurrentQuestionNoRefresh == 0 && mPlayerList.Count == 1)
+            return "Bienvenidos a una partida de Zenba! Hoy tenemos una partida muy poco interesante con tan solo un concursante. Mi bola de cristal me dice que <b>" + mPlayerList[0].mName + "</b> ganará la partida. ¡EMPEZAMOS!";
+        if (mCurrentQuestionNoRefresh == 0 && mPlayerList.Count == 2)
+            return "Bienvenidos a una partida de Zenba! Hoy tenemos un duelo entre <b>" + mPlayerList[0].mName + "</b> y <b>" + mPlayerList[0].mName + "</b>. ¡EMPEZAMOS CON EL 1 CONTRA 1!";
+        if (!Winner().Equals(""))
+            return "¡FELICIDADES A <b>" + mPlayerList[0].mName + "</b>! Eres el ganador de la partida de hoy. Aquí termina esta disputado juego, les esperamos en las siguientes ediciones de Zenba!";
+        if (playersCorrect.Count == mPlayerList.Count && mPlayerList.Count > 2)
+            return "¡INCREIBLE! Todos los concursantes contestaron correctamente. La clasificación no se mueve.";
+        if (playersNoCorrect.Count == 1 && mPlayerList.Count > 2)
+            return "Parece que <b>" + playersNoCorrect[0] + "</b> a sido el único participante que no sabía de lo que le estaban hablando...";
+        if (playersNoCorrect.Count == 2 && mPlayerList.Count > 2)
+            return "Parece que <b>" + playersNoCorrect[0] + "</b> y <b>" + playersNoCorrect[1] + "</b> no estaban atentos a la pregunta y les han pillado hablando de sus cosas... que sea la última vez!";
+        if (playersCorrect.Count == 2 && mPlayerList.Count > 2)
+            return "<b>" + playersCorrect[0] + "</b> y <b>" + playersCorrect[1] + "</b> son los únicos que encertaron la pregunta. 20 puntos más que se suman a sus clasificaciones.";
+        if (mCurrentQuestionNoRefresh == 1 && playersCorrect.Count == 1 && mPlayerList.Count > 2)
+            return "¡Parece que <b>" + mPlayerList[0].mName + "</b> empieza muy fuerte! Su respuesta correcta le lleva a lo más alto de la clasificación. Por suerte para los demás participantes, esto acaba de empezar.";
+        if (mCurrentQuestionNoRefresh == 1 && playersCorrect.Count == 2 && mPlayerList.Count > 2)
+            return "¡Parece que <b>" + mPlayerList[0].mName + "</b> y <b>" + mPlayerList[1].mName + "</b> empiezan muy fuerte! Sus respuestas correctas los llevan a lo más alto de la clasificación. Por suerte para los demás participantes, esto acaba de empezar.";
+        if (mCurrentQuestionNoRefresh == 1 && mPlayerList.Count > 2)
+            return "<b>" + mPlayerList[0].mName + "</b> se pone en cabeza con la primera pregunta de la partida de hoy. ¿Podrá mantener esta poca ventaja que tiene con los demás?";
+        if (playersCorrect.Count == 1 && mPlayerList.Count > 2)
+            return "¡<b>" + playersCorrect[0] + "</b> a sido el único concursante en responder bien la pregunta! Coge ventaja con todos los demás.";
+        if (max != 0 && (max + min) > 0 && mPlayerList.Count > 2)
+            return "¡<b>" + winPos + "</b> escala " + max + " posiciones con una sola pregunta! ¿Empieza su remontada?";
+        if (min != 0 && (max + min) < 0 && mPlayerList.Count > 2)
+            return "¡<b>" + winPos + "</b> baja " + max + " posiciones con una sola pregunta! Las cosas no le están saliendo como quería...";
+        if (mCurrentQuestionNoRefresh == 1 && mPlayerList.Count > 2 && mPlayerList[0].mPoints != mPlayerList[1].mPoints)
+            return "<b>" + mPlayerList[0].mName + "</b> se pone en cabeza con la primera pregunta de la partida de hoy. ¿Podrá mantener esta poca ventaja que tiene con los demás?";
+        if (mCurrentQuestionNoRefresh == 1 && mPlayerList.Count > 2 && mPlayerList[0].mPoints == mPlayerList[1].mPoints && mPlayerList[1].mPoints != mPlayerList[2].mPoints)
+            return "<b>" + mPlayerList[0].mName + "</b> y <b>"  + mPlayerList[1].mName + "</b> se ponen en cabeza con la primera pregunta de la partida de hoy. ¿Quién ganará este duelo tan interesante?";
+        if (mCurrentQuestionNoRefresh == 1 && mPlayerList.Count == 1 && playersCorrect.Count == 0)
+            return "<b>" + mPlayerList[0].mName + "</b> esperaba que me dedicaras una respuesta correcta para la primera pregunta... espero que en las siguientes puedas conseguir los 20 puntos.";
+        if (mCurrentQuestionNoRefresh == 1 && mPlayerList.Count == 1 && playersCorrect.Count == 1)
+            return "¡Primera pregunta y consigues los 20 puntos... no esta mal para empezar <b>" + mPlayerList[0].mName + "</b>!";
+        if (playersCorrect.Count == 1 && mPlayerList.Count == 1)
+            return "<b>" + mPlayerList[0].mName + "</b>, jugar solo y sin presión te sienta mejor. ¡Muy buena respuesta!";
+        if (playersCorrect.Count == 0 && mPlayerList.Count == 1)
+            return "Aprovecha que juegas solo para intentar consiguir los 20 puntos, <b>" + mPlayerList[0].mName + "</b>. !Suerte para la siguiente pregunta!";
+        if (playersCorrect.Count == 0 && mPlayerList.Count == 2)
+            return "Se puede sentir el respeto entre <b>" + mPlayerList[0].mName + "</b> y <b>" + mPlayerList[1].mName + "</b> y nadie de los dos quiere contestar bien las preguntas!";
+        if (playersCorrect.Count == 2 && mPlayerList.Count == 2)
+            return "Nadie de los dos quiere dar ventaja al otro concursante. ¡40 puntos que se reparten entre los dos!";
+        if (playersCorrect.Count == 1 && mPlayerList.Count == 2)
+            return "¡Magnifica respuesta correcta de <b>" + playersCorrect[0] + "</b> que consigue sumar más puntos que <b>" + playersNoCorrect[0] + "</b>!";
+        if (mPlayerList.Count > 1 && mPlayerList[mPlayerList.Count - 1].mPoints == 0)
+            return "Parece que <b>" + mPlayerList[mPlayerList.Count - 1].mName + "</b> todavía no ha encendido el teléfono...";
+        if (mPlayerList.Count > 2 && mPlayerList[0].mPoints == mPlayerList[1].mPoints && mPlayerList[1].mPoints != mPlayerList[2].mPoints)
+            return "<b>" + mPlayerList[0].mName + "</b> y <b>" + mPlayerList[1].mName + "</b> se ponen en cabeza con un empate de puntos. ¿Quién ganará este duelo tan interesante?";
+        if (mPlayerList.Count > 2 && mPlayerList[0].mPoints == mPlayerList[1].mPoints && mPlayerList[1].mPoints == mPlayerList[2].mPoints)
+            return "¡Increible! Tenemos un triple empate entre <b>" + mPlayerList[0].mName + "</b>, <b>" + mPlayerList[1].mName + "</b> y <b>" + mPlayerList[2].mName + "</b> para conquistar la cima de la victoria. ¿Quén será el campeón de los tres?";
+        if (mPlayerList.Count > 1 && mPlayerList[0].mPoints != mPlayerList[1].mPoints)
+            return "Parece que a <b>" + mPlayerList[0].mName + "</b> le está gustando estar arriba de todo... ";
+        if (mPlayerList.Count > 1 && mPlayerList[0].mPoints == mPlayerList[1].mPoints)
+            return "<b>" + mPlayerList[0].mName + "</b> y <b>" + mPlayerList[1].mName + "</b> están empatados a puntos en lo más alto de la cima!";
+        return "";
+    }
+
+    public void SaveLastPositions()
+    {
+        GlobalVariables.mPositionsLastPlay.Clear();
+        foreach (PlayerInfo item in mPlayerList)
+        {
+            GlobalVariables.mPositionsLastPlay.Add(item.mName);
+        }
+    }
+
     //Countdown Thread
     IEnumerator LoseTime()
     {
@@ -357,9 +516,18 @@ public class PlayerListScript : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(32);
+            yield return new WaitForSeconds(35);
             CheckDataSave();
             Debug.Log("Check");
+        }
+    }
+
+    IEnumerator PlayBootCourtine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            BootPlay();
         }
     }
 

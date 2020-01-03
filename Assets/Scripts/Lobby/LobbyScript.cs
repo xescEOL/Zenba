@@ -101,6 +101,7 @@ public class LobbyScript : MonoBehaviour
         SceneManager.LoadScene("Menu");
     }
 
+
     public bool CorrectQuestion()
     {
         return ((((mMaxOption - mCorrectAnswer) / mVariant) + ((mCorrectAnswer - mMinOption) / mVariant)) >= 20) & mMaxOption > mCorrectAnswer & mMinOption < mCorrectAnswer;

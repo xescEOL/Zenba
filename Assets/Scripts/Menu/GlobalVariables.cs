@@ -22,6 +22,7 @@ public class GlobalVariables : MonoBehaviour
     public static int mGameWinValue = 99999;
     public static string mGameAdminUId = "";
     public static string mGameName = "";
+    public static List<string> mPositionsLastPlay = new List<string>();
 
     private void Awake()
     {
@@ -65,6 +66,23 @@ public class GlobalVariables : MonoBehaviour
             DataSnapshot snapshot = task.Result;
             mNumQuizs20 = int.Parse(snapshot.ChildrenCount.ToString());
         });
+    }
+
+    public static void ResetVariables()
+    {
+        mUserPoints = -999999;
+        mUserGames = -999999;
+        mPinGame = "";
+        mNumQuizs20 = 0;
+        mListQuizs.Clear();
+        mCurrentQuizs = 0;
+        mCurrentPoints = 0;
+        mGameMode = 0;
+        mGameWinMode = 0;
+        mGameWinValue = 99999;
+        mGameAdminUId = "";
+        mGameName = "";
+        mPositionsLastPlay.Clear();
     }
 
 }

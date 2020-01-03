@@ -30,6 +30,7 @@ public class FindGameScript : MonoBehaviour
 
     public void FindGame()
     {
+        Debug.Log("Buscando partida");
         RetrieveInfo();
     }
 
@@ -62,6 +63,7 @@ public class FindGameScript : MonoBehaviour
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(false);
                         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(0);
+                        reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("boot").SetValueAsync(false);
                         SceneManager.LoadScene("WaitingPlayers");
                     }
                 }
@@ -81,13 +83,14 @@ public class FindGameScript : MonoBehaviour
                     reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("racha").SetValueAsync(0);
                     reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(false);
                     reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("emoji").SetValueAsync(0);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("boot").SetValueAsync(false);
                     reference.Child("games").Child(GlobalVariables.mPinGame).Child("currentgame").SetValueAsync(0);
-                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync(GlobalVariables.mPinGame);
+                    reference.Child("games").Child(GlobalVariables.mPinGame).Child("name").SetValueAsync("_findgame");
                     reference.Child("games").Child(GlobalVariables.mPinGame).Child("bonus").SetValueAsync(0);
                     reference.Child("games").Child(GlobalVariables.mPinGame).Child("findgame").SetValueAsync(true);
                     GlobalVariables.mGameAdminUId = auth.CurrentUser.UserId;
                     GlobalVariables.mGameMode = 0;
-                    GlobalVariables.mGameName = GlobalVariables.mPinGame;
+                    GlobalVariables.mGameName = "_findgame";
                     GlobalVariables.mGameWinMode = 0;
                     GlobalVariables.mGameWinValue = 10;
                     CreateListQuizs();
