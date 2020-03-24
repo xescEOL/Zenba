@@ -14,6 +14,7 @@ public class MenuScript : MonoBehaviour
     private bool mUserNameBool = false;
     private bool mLoading100 = false;
     private bool mCurrentVersionInstalled = false;
+    public string mVersionApp = "";
 
     public GameObject mLoading;
     public GameObject mPrincipalMenu;
@@ -43,7 +44,8 @@ public class MenuScript : MonoBehaviour
     {
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         reference = FirebaseDatabase.DefaultInstance.RootReference;
-        mAppInfo.text = "Zenba 2020 - Ver: " + Application.version;
+        mVersionApp = Application.version;
+        mAppInfo.text = "Zenba 2020 - Ver: " + mVersionApp;
         GetCurrentVersion();
         mLoading.SetActive(true);
         mPrincipalMenu.SetActive(false);
@@ -65,7 +67,6 @@ public class MenuScript : MonoBehaviour
             int index = (int)(Time.time * fps) % frames.Length;
             LoadingImg.texture = frames[index];
         }
-
         if (GlobalVariables.mUserGames != -999999 && GlobalVariables.mUserPoints != -999999 && !GlobalVariables.mUserName.Equals("") && !mUserNameBool && GlobalVariables.mNumQuizs20 != 0 && mCurrentVersionInstalled)
         {
             //Debug.Log("100%");
@@ -184,7 +185,7 @@ public class MenuScript : MonoBehaviour
             else if (task.IsCompleted)
             {
                 DataSnapshot levelSnapshot = task.Result;
-                if (levelSnapshot.Child("version").Value.ToString().Equals(Application.version))
+                if (levelSnapshot.Child("version").Value.ToString().Equals(mVersionApp))
                 {
                     auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
                     if (auth.CurrentUser != null)
