@@ -16,8 +16,13 @@ public class QuizScene : MonoBehaviour
     public GameObject mButtonBonus15;
     public GameObject mButtonBonusRnd;
     public GameObject mResult;
+    public GameObject mNumQuiz;
+    public GameObject mTotalQuizs;
+    public GameObject mPosition;
+    public GameObject mTopicTxt;
+    public GameObject mTopicImg;
     public Text mAnserTxt;
-    public Image mAnswerBG;
+    public GameObject mAnswerBG;
     private static DatabaseReference reference;
     private static Firebase.Auth.FirebaseAuth auth;
     public double mFirstElement;
@@ -26,7 +31,6 @@ public class QuizScene : MonoBehaviour
     public float mTimeLeft = 5;
     public float mTimeQuizLeft = 20;
     public bool mStartTime = false;
-    Animator mAnswerAnim;
     private int mCurrentRacha = 0;
     public GameObject mSecondsTextGame;
 
@@ -41,11 +45,15 @@ public class QuizScene : MonoBehaviour
     void Start()
     {
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
-        mAnswerAnim = mAnswerBG.GetComponent<Animator>();
         reference = FirebaseDatabase.DefaultInstance.RootReference;
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         mResult.SetActive(false);
         mSecondsTextGame.GetComponent<UnityEngine.UI.Text>().text = mTimeQuizLeft.ToString("0");
+        mNumQuiz.GetComponent<UnityEngine.UI.Text>().text = (GlobalVariables.mCurrentQuizs + 1).ToString("0")+"/";
+        mTotalQuizs.GetComponent<UnityEngine.UI.Text>().text = GlobalVariables.mGameWinValue.ToString("0");
+        mPosition.GetComponent<UnityEngine.UI.Text>().text = GetPosition().ToString("0") + "º";
+        mTopicTxt.GetComponent<UnityEngine.UI.Text>().text = GetTopicTxt();
+        mTopicImg.GetComponent<UnityEngine.UI.Image>().sprite = GetTopicImg();
         Time.timeScale = 1;
         StartCoroutine(QuizTimeDown());
         mAnswerUser = -12345678;
@@ -100,6 +108,40 @@ public class QuizScene : MonoBehaviour
     {
         return LobbyScript.mQuizTxt;
     }
+
+        public string GetTopicTxt()
+    {
+
+        if (LobbyScript.mTopicQuiz.Equals("1"))
+                return "Ciencia y Naturaleza";
+        if (LobbyScript.mTopicQuiz.Equals("2"))
+                return "Historia";
+        if (LobbyScript.mTopicQuiz.Equals("3"))
+                return "Deportes";
+        if (LobbyScript.mTopicQuiz.Equals("4"))
+                return "Actualidad";
+        if (LobbyScript.mTopicQuiz.Equals("5"))
+                return "Arte y Literatura";
+
+        return "Actualidad";
+    }
+
+            public Sprite GetTopicImg()
+    {
+
+        if (LobbyScript.mTopicQuiz.Equals("1"))
+                return Resources.Load<Sprite>("NaturaTopic");
+        if (LobbyScript.mTopicQuiz.Equals("2"))
+                return Resources.Load<Sprite>("HistoriaTopic");
+        if (LobbyScript.mTopicQuiz.Equals("3"))
+                return Resources.Load<Sprite>("DeportesTopic");
+        if (LobbyScript.mTopicQuiz.Equals("4"))
+                return Resources.Load<Sprite>("ActualidadTopic");
+        if (LobbyScript.mTopicQuiz.Equals("5"))
+                return Resources.Load<Sprite>("ArteTopic");
+
+        return Resources.Load<Sprite>("ActualidadTopic");
+    }
    
 
     public void SetAnswerUser(double pAnswerUser)
@@ -125,7 +167,7 @@ public class QuizScene : MonoBehaviour
                 reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("bonus").SetValueAsync(true);
                 mCurrentRacha = 0;
             }
-            mAnswerAnim.SetBool("PlayAnim", true);
+            mAnswerBG.GetComponent<UnityEngine.UI.Image>().sprite = Resources.Load<Sprite>("correctstar_background");
         }
         else
         {
@@ -135,7 +177,7 @@ public class QuizScene : MonoBehaviour
             
         }
         mResult.transform.GetChild(2).gameObject.GetComponent<UnityEngine.UI.Text>().text = LobbyScript.mCorrectAnswer.ToString();
-        mResult.transform.GetChild(3).gameObject.GetComponent<UnityEngine.UI.Text>().text = "+" + GetPointsAnswer() + "p";
+        mResult.transform.GetChild(3).gameObject.GetComponent<UnityEngine.UI.Text>().text = GetPointsAnswer() + "p";
         Debug.Log("POINTS: " + GetPointsAnswer());
         GlobalVariables.mCurrentQuizs++;
         reference.Child("games").Child(GlobalVariables.mPinGame).Child("players").Child(auth.CurrentUser.UserId).Child("currentquestion").SetValueAsync(GlobalVariables.mCurrentQuizs);
@@ -231,6 +273,17 @@ public class QuizScene : MonoBehaviour
                 return item.mRacha;
         }
         return 0;
+    }
+
+    public int GetPosition()
+    {
+        int pos = 0;
+        foreach (PlayerInfo item in PlayerListScript.mPlayerList){
+            pos++;
+            if (item.mUid.Equals(auth.CurrentUser.UserId))
+                return pos;
+        }
+        return 1;
     }
 
     public void BonusRndLaunch()

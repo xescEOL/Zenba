@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Firebase;
@@ -29,7 +29,6 @@ public class GlobalVariables : MonoBehaviour
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         FirebaseApp.DefaultInstance.SetEditorDatabaseUrl("https://zenba-3a261.firebaseio.com/");
         DatabaseReference reference = FirebaseDatabase.DefaultInstance.RootReference;
-        Debug.Log("hola");
         RetrieveInfo(auth.CurrentUser.UserId);
         RetrieveNumQuizs("questsESP");
     }
@@ -51,7 +50,6 @@ public class GlobalVariables : MonoBehaviour
         //Retrieve the data and convert it to string...
         FirebaseDatabase.DefaultInstance.GetReference("users").GetValueAsync().ContinueWith(task =>
         {
-            Debug.Log("userid: " + pUserUID);
             DataSnapshot snapshot = task.Result.Child(pUserUID);
             mUserPoints = double.Parse(snapshot.Child("points").Value.ToString());
             mUserGames = double.Parse(snapshot.Child("games").Value.ToString());

@@ -16,6 +16,11 @@ public class PatataScript : MonoBehaviour
     public GameObject mAnswerTxt;
     public GameObject mPistaTxt;
     public GameObject mQuizTxt;
+    public GameObject mNumQuiz;
+    public GameObject mTotalQuizs;
+    public GameObject mPosition;
+    public GameObject mTopicTxt;
+    public GameObject mTopicImg;
     AudioSource audioData;
     public GameObject mTimeBar;
 
@@ -40,6 +45,11 @@ public class PatataScript : MonoBehaviour
         auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
         mQuizTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = LobbyScript.mQuizTxt;
         mAnim = mTimeBar.transform.GetChild(0).GetComponent<Animator>();
+        mNumQuiz.GetComponent<UnityEngine.UI.Text>().text = (GlobalVariables.mCurrentQuizs + 1).ToString("0")+"/";
+        mTotalQuizs.GetComponent<UnityEngine.UI.Text>().text = GlobalVariables.mGameWinValue.ToString("0");
+        mPosition.GetComponent<UnityEngine.UI.Text>().text = GetPosition().ToString("0") + "º";
+        mTopicTxt.GetComponent<UnityEngine.UI.Text>().text = GetTopicTxt();
+        mTopicImg.GetComponent<UnityEngine.UI.Image>().sprite = GetTopicImg();
         audioData = GetComponent<AudioSource>();
         mAnim.SetBool("Start", true);
         StartCoroutine(LoseTime());
@@ -89,6 +99,51 @@ public class PatataScript : MonoBehaviour
                 mPistaTxt.gameObject.GetComponent<UnityEngine.UI.Text>().text = "MENOS";
             }
         }
+    }
+
+    public string GetTopicTxt()
+    {
+
+        if (LobbyScript.mTopicQuiz.Equals("1"))
+                return "Ciencia y Naturaleza";
+        if (LobbyScript.mTopicQuiz.Equals("2"))
+                return "Historia";
+        if (LobbyScript.mTopicQuiz.Equals("3"))
+                return "Deportes";
+        if (LobbyScript.mTopicQuiz.Equals("4"))
+                return "Actualidad";
+        if (LobbyScript.mTopicQuiz.Equals("5"))
+                return "Arte y Literatura";
+
+        return "Actualidad";
+    }
+
+            public Sprite GetTopicImg()
+    {
+
+        if (LobbyScript.mTopicQuiz.Equals("1"))
+                return Resources.Load<Sprite>("NaturaTopic");
+        if (LobbyScript.mTopicQuiz.Equals("2"))
+                return Resources.Load<Sprite>("HistoriaTopic");
+        if (LobbyScript.mTopicQuiz.Equals("3"))
+                return Resources.Load<Sprite>("DeportesTopic");
+        if (LobbyScript.mTopicQuiz.Equals("4"))
+                return Resources.Load<Sprite>("ActualidadTopic");
+        if (LobbyScript.mTopicQuiz.Equals("5"))
+                return Resources.Load<Sprite>("ArteTopic");
+
+        return Resources.Load<Sprite>("ActualidadTopic");
+    }
+
+    public int GetPosition()
+    {
+        int pos = 0;
+        foreach (PlayerInfo item in PlayerListScript.mPlayerList){
+            pos++;
+            if (item.mUid.Equals(auth.CurrentUser.UserId))
+                return pos;
+        }
+        return 1;
     }
 
     public void SaveQuizResult()

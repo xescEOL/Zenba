@@ -24,6 +24,7 @@ public class LobbyScript : MonoBehaviour
     public bool mRetrieveDB = false;
     public long mCountQuizs = 0;
     public int mTipoQuiz = 0;
+    public static string mTopicQuiz = "";
     // Start is called before the first frame update
 
     private void Awake()
@@ -77,6 +78,7 @@ public class LobbyScript : MonoBehaviour
             mQuizTxt = snapshot.Child(quizNumber).Child("question").Value.ToString();
             mCorrectAnswer = double.Parse(snapshot.Child(quizNumber).Child("correct").Value.ToString(), CultureInfo.InvariantCulture);
             mVariant = double.Parse(snapshot.Child(quizNumber).Child("variant").Value.ToString(), CultureInfo.InvariantCulture);
+            mTopicQuiz = snapshot.Child(quizNumber).Child("tipo").Value.ToString();
             if (snapshot.Child(quizNumber).Child("maxValue").Value.ToString() == "")
                 mMaxOption = 99999999;
             else

@@ -184,9 +184,9 @@ public class PlayerListScript : MonoBehaviour
                 transform.GetChild(cont).transform.GetChild(6).gameObject.SetActive(false);
             }
             if (item.mUid.Equals(auth.CurrentUser.UserId))
-                transform.GetChild(cont).GetComponent<UnityEngine.UI.Image>().color = Color.yellow;
+                transform.GetChild(cont).GetComponent<UnityEngine.UI.Image>().color = new Color(255, 213, 0, 1f);
             else
-                transform.GetChild(cont).GetComponent<UnityEngine.UI.Image>().color = Color.white;
+                transform.GetChild(cont).GetComponent<UnityEngine.UI.Image>().color = new Color(255, 213, 0, 0f);
             cont++;
             }
             mChangeListPlayers = false;
